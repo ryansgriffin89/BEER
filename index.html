@@ -228,11 +228,7 @@
       bottom:0;
       width:100%;
       height:100%;
-      background:
-        linear-gradient(180deg,
-          rgba(255,220,140,0.96),
-          rgba(255,170,60,0.96)
-        );
+      background: linear-gradient(180deg, rgba(255,220,140,0.96), rgba(255,170,60,0.96));
       box-shadow: inset 0 0 12px rgba(255,255,255,0.20);
       transition: height 0.9s ease;
     }
@@ -321,6 +317,7 @@
       z-index: 10000;
       padding: 16px;
       transition: opacity 0.5s;
+      touch-action: manipulation; /* IMPORTANT for Android tap reliability */
     }
     .overlayGif{
       width: min(520px, 92vw);
@@ -346,7 +343,7 @@
       text-transform: uppercase;
       animation: blink 2s infinite;
     }
-    @keyframes blink { 50%{ opacity: 0.55; }}
+    @keyframes blink { 50%{ opacity: 0.55; } }
 
     /* Modals */
     .modalBackdrop{
@@ -359,7 +356,6 @@
       z-index: 11000;
     }
     .modalBackdrop.show{ display:flex; }
-
     .modal{
       width: min(560px, 96vw);
       max-height: 86vh;
@@ -530,6 +526,7 @@
       <div id="hint">Hold the mug to drain it</div>
 
       <div id="bottleDeco" aria-hidden="true">
+        <!-- FIXED: MT.jpeg -->
         <img src="assets/img/MT.png" alt="Bottle">
       </div>
 
@@ -541,10 +538,9 @@
     // ----------------------------
     // Keys
     // ----------------------------
-    const KEY_EVENTS = "drunkRyanEventsV2";        // array of timestamps (ms)
+    const KEY_EVENTS = "drunkRyanEventsV2"; // array of timestamps (ms)
     const KEY_HINT_SEEN = "drunkRyanHintSeenV1";
     const KEY_SOUND_INDEX = "drunkRyanSoundIndexV1";
-    const KEY_STARTED = "drunkRyanStartedV1";
 
     // ----------------------------
     // Elements
@@ -575,6 +571,7 @@
     // ----------------------------
     const INTRO_SRC = "assets/audio/stone-cold-drink-beer.mp3";
 
+    // Rotation excludes intro
     const ROTATION = [
       "assets/audio/beer-bottle-clinks.mp3",
       "assets/audio/Bell.mp3",
@@ -590,21 +587,12 @@
 
     const CLINKS_MAX_SECONDS = 1.5;
 
-    let introHasPlayed = false;
-    let audioCtx = null;
     let channel = null;
 
     let soundIndex = (() => {
       const saved = parseInt(localStorage.getItem(KEY_SOUND_INDEX) || "0", 10);
       return Number.isFinite(saved) ? (saved % ROTATION.length) : 0;
     })();
-
-    async function unlockAudio(){
-      try{
-        if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        if(audioCtx.state !== "running") await audioCtx.resume();
-      }catch(e){}
-    }
 
     function stopChannel(){
       try{
@@ -616,28 +604,6 @@
       channel = null;
     }
 
-    async function playIntro(){
-      if(introHasPlayed) return;
-      introHasPlayed = true;
-
-      await unlockAudio();
-
-      const intro = new Audio(encodeURI(INTRO_SRC));
-      intro.volume = 1.0;
-      intro.play().catch(()=>{});
-
-      startupOverlay.style.opacity = "0";
-      setTimeout(() => startupOverlay.classList.add("hidden"), 500);
-
-      localStorage.setItem(KEY_STARTED, "1");
-    }
-
-    function ensureStarted(){
-      // If overlay still visible, user hasn't tapped it yet — don't auto-play intro.
-      // But we still allow app to function without intro.
-      return;
-    }
-
     function playRotatingSound(){
       stopChannel();
 
@@ -645,6 +611,7 @@
       const a = new Audio(encodeURI(src));
       a.volume = 0.85;
 
+      // Auto-trim clinks to 1.5s
       if(src.includes("beer-bottle-clinks.mp3")){
         const stopper = () => {
           if(a.currentTime >= CLINKS_MAX_SECONDS){
@@ -710,7 +677,6 @@
       const pileCount = Math.min(30, events.length);
       for(let i=0;i<pileCount;i++) addPileItem(false);
 
-      // one-time hint
       if(localStorage.getItem(KEY_HINT_SEEN) === "1"){
         hintEl.classList.add("hidden");
       }
@@ -857,7 +823,6 @@
       countEl.textContent = String(events.length);
       addPileItem(true);
 
-      // toast if newly unlocked badge
       const newlyUnlocked = BADGES.find(b => prevTotal < b.req && events.length >= b.req);
       if(newlyUnlocked){
         showToast(`Unlocked: ${newlyUnlocked.name}`);
@@ -867,7 +832,6 @@
         vibrate(18);
       }
 
-      // hide hint forever after first real log
       if(localStorage.getItem(KEY_HINT_SEEN) !== "1"){
         localStorage.setItem(KEY_HINT_SEEN, "1");
         hintEl.classList.add("hidden");
@@ -893,7 +857,6 @@
     function startHold(){
       draining = false;
 
-      // show full beer overlay immediately
       beerLiquid.style.height = "100%";
       beerMask.style.opacity = "1";
 
@@ -915,7 +878,6 @@
         holdTimer = null;
       }
 
-      // If not draining, it's a tap: log immediately
       if(!draining){
         resetBeer();
         logBeer();
@@ -928,18 +890,45 @@
     mugBtn.addEventListener("pointerleave", () => { if(holdTimer || draining) endHold(); });
 
     // ----------------------------
-    // Intro overlay (mobile-safe)
+    // Intro overlay (FIXED for Android)
+    // - No async/await
+    // - Overlay always dismisses immediately
+    // - Audio play attempted in same gesture stack
     // ----------------------------
-    startupOverlay.addEventListener("pointerdown", async (e) => {
-      e.preventDefault();
-      await playIntro();
-    }, { passive:false });
+    const introAudio = new Audio(INTRO_SRC);
+    introAudio.volume = 1.0;
+    let introStarted = false;
 
-    // If user already started in past, hide overlay immediately
-    if(localStorage.getItem(KEY_STARTED) === "1"){
-      introHasPlayed = true; // don't try to replay intro automatically
-      startupOverlay.classList.add("hidden");
+    function hideStartupOverlay(){
+      startupOverlay.style.opacity = "0";
+      setTimeout(() => startupOverlay.classList.add("hidden"), 450);
     }
+
+    function startFromOverlay(e){
+      if(introStarted) return;
+      introStarted = true;
+
+      hideStartupOverlay();
+
+      // Try to unlock audio context WITHOUT awaiting
+      try{
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if(AC){
+          const ctx = new AC();
+          ctx.resume().catch(()=>{});
+        }
+      }catch(_){}
+
+      // Play intro in the same call stack
+      try{
+        introAudio.currentTime = 0;
+        introAudio.play().catch(()=>{});
+      }catch(_){}
+    }
+
+    startupOverlay.addEventListener("pointerdown", (e) => { e.preventDefault(); startFromOverlay(e); }, { passive:false });
+    startupOverlay.addEventListener("touchstart", (e) => { e.preventDefault(); startFromOverlay(e); }, { passive:false });
+    startupOverlay.addEventListener("click", startFromOverlay);
 
     // ----------------------------
     // Modals
