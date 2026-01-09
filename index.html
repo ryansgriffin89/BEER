@@ -8,207 +8,142 @@
   
   <style>
     :root {
-      --radius: 22px;
       --gold: #f7c948;
-      --glass: rgba(0,0,0,0.6);
-      --foam: rgba(255,255,255,0.9);
+      --foam: rgba(255,255,255,0.95);
     }
-
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    html, body { height: 100%; }
-    
-    body {
-      margin: 0;
-      font-family: system-ui, -apple-system, sans-serif;
-      color: white;
-      background: #0b0d10;
-      overflow: hidden;
-      touch-action: manipulation;
-    }
+    html, body { height: 100%; margin: 0; overflow: hidden; background: #0b0d10; font-family: system-ui, sans-serif; touch-action: manipulation; }
 
-    /* --- Background --- */
+    /* Background */
     .bg {
-      position: fixed; inset: 0;
-      background:
-        radial-gradient(circle at 50% 10%, rgba(247,201,72,0.1), transparent 50%),
-        url("assets/img/Background.png");
-      background-size: cover; background-position: center;
-      filter: saturate(1.1) brightness(0.8);
-      z-index: -2;
+      position: fixed; inset: 0; z-index: -2;
+      background: radial-gradient(circle at 50% 10%, rgba(247,201,72,0.1), transparent 50%), url("assets/img/Background.png");
+      background-size: cover; background-position: center; filter: saturate(1.1) brightness(0.8);
     }
 
     .wrap {
-      width: min(600px, 100%);
-      margin: 0 auto;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      position: relative;
+      width: min(600px, 100%); margin: 0 auto; height: 100vh;
+      display: flex; flex-direction: column; position: relative;
     }
 
-    /* --- Top Bar --- */
+    /* Top Stats Bar */
     .top-bar {
       display: flex; justify-content: space-between; align-items: flex-start;
       padding: 16px; z-index: 10;
     }
-    
-    .btn {
-      background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.2);
-      color: #ddd; padding: 8px 12px; border-radius: 16px;
+    .stats-btn {
+      background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.3);
+      color: #fff; padding: 8px 14px; border-radius: 20px;
       font-size: 11px; text-transform: uppercase; letter-spacing: 1px;
-      backdrop-filter: blur(4px); cursor: pointer;
+      cursor: pointer; backdrop-filter: blur(4px);
     }
 
-    .live-stats {
-      text-align: right;
-      font-size: 11px; color: var(--gold);
-      text-shadow: 0 0 10px rgba(0,0,0,0.8);
-    }
-    .live-stats span { display: block; margin-bottom: 4px; }
-
-    /* --- Counter --- */
-    .counter-area {
-      text-align: center; margin-top: 10px; z-index: 5;
-    }
+    /* Main Counter Title */
+    .counter-area { text-align: center; margin-top: 10px; z-index: 5; }
     .counter-area h1 {
-      font-size: 80px; font-weight: 900; margin: 0; line-height: 0.9;
+      font-size: 90px; font-weight: 900; margin: 0; line-height: 0.9;
       background: linear-gradient(180deg, #fff, #bbb);
       -webkit-background-clip: text; color: transparent;
       filter: drop-shadow(0 5px 15px rgba(0,0,0,0.5));
     }
     .label {
-      font-size: 12px; text-transform: uppercase; letter-spacing: 3px;
-      color: rgba(255,255,255,0.5); margin-top: 5px;
+      font-size: 20px; font-weight: 900; text-transform: uppercase; letter-spacing: 4px;
+      color: var(--gold); margin-top: 5px; text-shadow: 0 2px 10px rgba(0,0,0,0.8);
     }
 
-    /* --- The Mug Stage --- */
+    /* Stage */
     .stage {
       flex-grow: 1; position: relative;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
     }
 
+    /* Mug Button */
     #mugBtn {
       position: relative; width: 240px; height: 240px;
-      background: none; border: none; padding: 0;
-      transform-origin: center bottom;
+      background: none; border: none; padding: 0; cursor: pointer; z-index: 8;
       transition: transform 0.1s;
-      cursor: pointer; z-index: 8;
     }
     #mugBtn:active { transform: scale(0.97); }
-
     .mugWrap { position: relative; width: 100%; height: 100%; }
-    .mugImg { 
-      position: relative; width: 100%; height: 100%; object-fit: contain; z-index: 5; 
-      filter: drop-shadow(0 20px 30px rgba(0,0,0,0.5));
-    }
+    .mugImg { width: 100%; height: 100%; object-fit: contain; position: relative; z-index: 5; filter: drop-shadow(0 20px 30px rgba(0,0,0,0.5)); }
 
-    /* LIQUID & FOAM FIX */
+    /* Liquid Animation */
     #beerMask {
-      position: absolute;
-      /* Tweak these to fit inside the glass part of your PNG */
-      left: 20%; width: 60%;
-      bottom: 12%; height: 68%;
-      z-index: 4; border-radius: 0 0 15px 15px;
-      overflow: hidden; opacity: 0; transition: opacity 0.2s;
+      position: absolute; left: 20%; width: 60%; bottom: 12%; height: 68%;
+      z-index: 4; border-radius: 0 0 15px 15px; overflow: hidden; opacity: 0; transition: opacity 0.2s;
     }
-    
-    #beerContainer {
-      position: absolute; bottom: 0; left: 0; width: 100%;
-      height: 100%; /* Animates to 0 */
-      transition: height 0.9s ease-in;
-    }
-
-    #beerLiquid {
-      width: 100%; height: 100%;
-      background: linear-gradient(to right, rgba(255,180,0,0.9), rgba(255,140,0,0.95));
-      position: relative;
-    }
-    /* Bubbles */
+    #beerContainer { width: 100%; height: 100%; position: absolute; bottom: 0; transition: height 0.9s ease-in; }
+    #beerLiquid { width: 100%; height: 100%; background: linear-gradient(to right, #ffb400, #ff8c00); position: relative; }
     #beerLiquid::after {
       content:""; position: absolute; inset: 0;
       background-image: radial-gradient(rgba(255,255,255,0.4) 1px, transparent 1px);
       background-size: 10px 10px; animation: bubbles 1.5s linear infinite;
     }
-    /* The Foam Head */
-    #foamHead {
-      position: absolute; top: 0; left: 0; width: 100%; height: 12px;
-      background: var(--foam);
-      border-radius: 10px 10px 0 0;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
+    #foamHead { width: 100%; height: 14px; background: var(--foam); border-radius: 10px 10px 0 0; }
     @keyframes bubbles { from{background-position:0 0;} to{background-position:0 -20px;} }
 
-    /* --- Pile (Randomized) --- */
+    /* Controls (Trash & Vape) */
+    .controls {
+      position: absolute; bottom: 130px; width: 100%;
+      display: flex; justify-content: space-between; padding: 0 30px;
+      z-index: 20; pointer-events: none; /* Let clicks pass through empty space */
+    }
+    .ctrl-btn {
+      pointer-events: auto; display: flex; flex-direction: column; align-items: center;
+      opacity: 0.8; transition: 0.2s; cursor: pointer;
+    }
+    .ctrl-btn img { width: 50px; height: 50px; object-fit: contain; filter: drop-shadow(0 5px 5px rgba(0,0,0,0.6)); }
+    .ctrl-btn span { color: #fff; font-size: 10px; margin-top: 4px; text-transform: uppercase; text-shadow: 0 2px 4px rgba(0,0,0,1); }
+    .ctrl-btn:active { transform: scale(0.9); opacity: 1; }
+
+    /* Pile */
     #beerPile {
       position: absolute; bottom: 0; left: 0; width: 100%; height: 120px;
       display: flex; justify-content: center; flex-wrap: wrap-reverse;
       padding: 10px; pointer-events: none; z-index: 2;
     }
-    .pileItem {
-      width: 35px; height: 35px; object-fit: contain;
-      filter: drop-shadow(0 5px 5px rgba(0,0,0,0.8));
-      transition: transform 0.2s;
-      /* Random rotation set in JS */
-    }
+    .pileItem { width: 35px; height: 35px; object-fit: contain; filter: drop-shadow(0 5px 5px rgba(0,0,0,0.8)); transition: transform 0.2s; }
 
-    /* --- Buttons Row --- */
-    .controls {
-      position: absolute; bottom: 120px; width: 100%;
-      display: flex; justify-content: space-around; padding: 0 40px;
-      z-index: 20;
-    }
-    .icon-btn {
-      display: flex; flex-direction: column; align-items: center;
-      opacity: 0.7; transition: 0.2s;
-    }
-    .icon-btn img { width: 40px; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.5)); }
-    .icon-btn span { font-size: 10px; margin-top: 5px; text-transform: uppercase; }
-    .icon-btn:active { transform: scale(0.9); opacity: 1; }
-
-    /* --- The Receipt Modal --- */
-    .receipt-modal {
+    /* Receipt Modal */
+    .modal-backdrop {
       position: fixed; inset: 0; background: rgba(0,0,0,0.85);
       display: none; align-items: center; justify-content: center; z-index: 100;
     }
-    .receipt-modal.show { display: flex; }
-    
+    .modal-backdrop.show { display: flex; }
+
     .paper {
-      background: #fdfbf7; color: #333;
-      width: 320px; max-height: 80vh;
-      font-family: 'VT323', monospace; /* Receipt Font */
-      padding: 20px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.5);
-      position: relative;
-      overflow: hidden;
+      background: #fdfbf7; color: #333; width: 320px; max-height: 80vh;
+      font-family: 'VT323', monospace; padding: 20px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.8); transform: rotate(-1deg);
       display: flex; flex-direction: column;
-      transform: rotate(-1deg);
     }
-    /* Jagged Edge CSS */
-    .paper::after {
-      content: ""; position: absolute; bottom: -10px; left: 0; right: 0; height: 20px;
-      background: linear-gradient(45deg, transparent 33.333%, #fdfbf7 33.333%, #fdfbf7 66.667%, transparent 66.667%),
-                  linear-gradient(-45deg, transparent 33.333%, #fdfbf7 33.333%, #fdfbf7 66.667%, transparent 66.667%);
-      background-size: 20px 40px; background-position: 0 -20px;
-    }
-    
-    .receipt-header { text-align: center; border-bottom: 1px dashed #333; padding-bottom: 10px; margin-bottom: 10px; }
-    .receipt-header h2 { margin: 0; font-size: 28px; text-transform: uppercase; }
+    .receipt-head { text-align: center; border-bottom: 2px dashed #333; padding-bottom: 10px; margin-bottom: 10px; }
     .receipt-body { overflow-y: auto; flex-grow: 1; font-size: 18px; }
     .receipt-row { display: flex; justify-content: space-between; margin-bottom: 4px; }
-    .receipt-footer { border-top: 1px dashed #333; margin-top: 10px; padding-top: 10px; font-size: 20px; display: flex; justify-content: space-between; font-weight: bold; }
-    .close-receipt { margin-top: 15px; width: 100%; border: 1px solid #333; background: transparent; padding: 5px; font-family: inherit; cursor: pointer; text-transform: uppercase; font-size: 18px; }
+    .receipt-foot { border-top: 2px dashed #333; margin-top: 10px; padding-top: 10px; font-size: 22px; font-weight: bold; display: flex; justify-content: space-between; }
+    
+    /* Badges Modal */
+    .badges-box {
+      background: #111; border: 1px solid #333; width: 340px; max-height: 80vh;
+      border-radius: 12px; padding: 20px; color: #fff; overflow-y: auto;
+    }
+    .badge-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+    .badge-card { background: #222; padding: 10px; border-radius: 8px; text-align: center; border: 1px solid #333; }
+    .badge-card.locked { opacity: 0.3; filter: grayscale(1); }
+    .badge-name { color: var(--gold); font-size: 12px; font-weight: bold; text-transform: uppercase; }
+    .badge-desc { font-size: 10px; color: #888; margin-top: 4px; }
 
-    /* --- Overlays & Hint --- */
-    .overlay { position: fixed; inset: 0; background: #000; z-index: 999; display: flex; justify-content: center; align-items: center; flex-direction: column; transition: opacity 0.5s; }
+    /* Overlays */
+    .overlay { position: fixed; inset: 0; background: #000; z-index: 999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.5s; }
     .overlay.hidden { display: none; }
     .overlayGif { width: 90%; max-width: 500px; border-radius: 10px; border: 1px solid #333; }
-    .overlayText { margin-top: 20px; color: var(--gold); font-size: 24px; font-weight: 900; }
-    #hint { position: absolute; bottom: 180px; width: 100%; text-align: center; font-size: 12px; color: rgba(255,255,255,0.5); pointer-events: none; }
-    #hint.hidden { display: none; }
+    .overlayText { margin-top: 20px; color: var(--gold); font-size: 30px; font-weight: 900; text-transform: uppercase; text-shadow: 0 0 20px rgba(247,201,72,0.5); }
     
-    /* Toast */
-    .toast { position: absolute; top: 80px; left: 50%; transform: translateX(-50%); background: #111; border: 1px solid #333; padding: 8px 16px; border-radius: 20px; opacity: 0; transition: 0.3s; pointer-events: none; font-size: 12px; text-transform: uppercase; }
-    .toast.show { opacity: 1; transform: translateX(-50%) translateY(10px); }
+    #hint { position: absolute; bottom: 190px; width: 100%; text-align: center; font-size: 12px; color: rgba(255,255,255,0.5); pointer-events: none; }
+    #hint.hidden { display: none; }
+
+    .toast { position: absolute; top: 100px; left: 50%; transform: translateX(-50%); background: #000; border: 1px solid var(--gold); color: var(--gold); padding: 8px 16px; border-radius: 20px; opacity: 0; transition: 0.3s; font-size: 12px; text-transform: uppercase; pointer-events: none; }
+    .toast.show { opacity: 1; transform: translateY(10px) translateX(-50%); }
 
   </style>
 </head>
@@ -222,40 +157,43 @@
     <div style="color:#666; margin-top:10px; font-size:12px; animation:blink 1s infinite;">TAP TO START</div>
   </div>
 
-  <div id="milestone" class="overlay hidden" style="background:rgba(0,0,0,0.9)">
-    <img id="milestoneGif" src="" class="overlayGif">
-    <div class="overlayText">HELL YEAH!</div>
+  <div id="badgeOverlay" class="overlay hidden" style="background:rgba(0,0,0,0.9)">
+    <img id="badgeGif" src="" class="overlayGif">
+    <div class="overlayText" id="badgeText">UNLOCKED!</div>
   </div>
 
-  <div id="receiptModal" class="receipt-modal">
+  <div id="receiptModal" class="modal-backdrop">
     <div class="paper">
-      <div class="receipt-header">
+      <div class="receipt-head">
         <h2>RYAN'S BAR</h2>
-        <div style="font-size:14px;">123 Stone Cold Ave</div>
+        <div style="font-size:16px;">123 Gimmicks Street</div>
         <div style="font-size:14px;" id="receiptDate"></div>
       </div>
-      <div class="receipt-body" id="receiptItems">
-        </div>
-      <div class="receipt-footer">
-        <span>TOTAL DUE:</span>
-        <span id="receiptTotal">$0.00</span>
+      <div class="receipt-body" id="receiptItems"></div>
+      <div class="receipt-foot">
+        <span>TOTAL:</span><span id="receiptTotal">$0.00</span>
       </div>
-      <button class="close-receipt" id="closeReceipt">Close Tab</button>
+      <button onclick="closeModals()" style="margin-top:15px; padding:10px; background:transparent; border:1px solid #333; font-family:inherit; text-transform:uppercase; cursor:pointer;">Close Tab</button>
+    </div>
+  </div>
+
+  <div id="badgesModal" class="modal-backdrop">
+    <div class="badges-box">
+      <h2 style="margin:0; text-transform:uppercase; color:var(--gold); border-bottom:1px solid #333; padding-bottom:10px;">Achievements</h2>
+      <div id="badgeList" class="badge-grid"></div>
+      <button onclick="closeModals()" style="width:100%; margin-top:15px; padding:10px; background:#333; color:#fff; border:none; border-radius:6px; cursor:pointer;">CLOSE</button>
     </div>
   </div>
 
   <div class="wrap" id="mainWrap">
     <div class="top-bar">
-      <div class="btn" id="viewTabBtn">View Tab</div>
-      <div class="live-stats">
-        <span id="paceStat">Pace: 0.0/hr</span>
-        <span id="sessionStat">Session: 0h 0m</span>
-      </div>
+      <div class="stats-btn" onclick="openReceipt()">View Tab</div>
+      <div class="stats-btn" onclick="openBadges()">Badges</div>
     </div>
 
     <div class="counter-area">
       <h1 id="count">0</h1>
-      <div class="label">BEERS DRUNK</div>
+      <div class="label">BEERS DRANK</div>
     </div>
 
     <div class="stage">
@@ -276,79 +214,111 @@
       <div id="hint">Hold to drain • Tap to log</div>
 
       <div class="controls">
-        <div class="icon-btn" id="undoBtn">
-          <span style="font-size:28px;">↩️</span>
-          <span>Undo</span>
+        <div class="ctrl-btn" id="vapeBtn">
+          <img src="assets/img/Vape.png" alt="Vape">
+          <span>Roach?</span>
         </div>
-        <div class="icon-btn" id="resetBtn">
-          <img src="assets/img/Trash-can.png" alt="Reset">
+        <div class="ctrl-btn" id="trashBtn">
+          <img src="assets/img/Trash-new.png" alt="Reset">
           <span>Reset</span>
         </div>
       </div>
     </div>
 
     <div id="beerPile"></div>
-
   </div>
 
 <script>
   // === CONFIG ===
-  const STORAGE_KEY = "drunkRyan_v5";
+  const STORAGE_KEY = "drunkRyan_v6_fixed"; // New key to fix the "100" bug
+  
+  // Audio Config
   const AUDIO = {
     intro: "assets/audio/stone-cold-drink-beer.mp3",
+    roach: "assets/audio/roach.mp3",
+    trash: "assets/audio/trash-sound.mp3",
     playlist: [
       "assets/audio/beer-bottle-clinks.mp3",
       "assets/audio/Bell.mp3",
       "assets/audio/SCSA-Theme.mp3",
       "assets/audio/What.mp3",
-      "assets/audio/John-cena.mp3"
+      "assets/audio/John-cena.mp3",
+      "assets/audio/kill-tony-song.mp3",
+      "assets/audio/miller-time.mp3"
     ]
   };
 
+  // Badge Config
+  const BADGES = [
+    { req: 1, name: "First Sip", desc: "The journey begins." },
+    { req: 5, name: "Warm Up", desc: "Just getting started." },
+    { req: 10, name: "Double Digits", desc: "Solid effort." },
+    { req: 20, name: "Stone Cold", desc: "Can I get a Hell Yeah?" },
+    { req: 24, name: "Case King", desc: "One whole case." },
+    { req: 100, name: "Centurion", desc: "Legendary status." }
+  ];
+
   // === STATE ===
-  let state = {
-    events: [],
-    soundIndex: 0
-  };
+  let state = { events: [], soundIndex: 0 };
+  let currentAudio = null; // To handle interrupting sounds
 
   // === INIT ===
   function init() {
     const saved = localStorage.getItem(STORAGE_KEY);
-    if(saved) state = JSON.parse(saved);
-    
+    if(saved) {
+      state = JSON.parse(saved);
+      // Safety check: if count is absurdly high from a glitch, reset it
+      if(!Array.isArray(state.events)) state.events = [];
+    }
     updateUI();
-    setInterval(updateStats, 60000); // Update stats every minute
-    
-    // Check if hint needed
     if(state.events.length > 0) document.getElementById("hint").classList.add("hidden");
   }
 
-  // === CORE FUNCTIONS ===
+  // === AUDIO ENGINE (INTERRUPT LOGIC) ===
+  function playGlobalSound(src, vol = 1.0) {
+    if(currentAudio) {
+      currentAudio.pause();
+      currentAudio.currentTime = 0;
+    }
+    currentAudio = new Audio(src);
+    currentAudio.volume = vol;
+    
+    // Trim Clinks
+    if(src.includes("clinks")) {
+      setTimeout(() => { 
+        if(currentAudio && currentAudio.src.includes("clinks")) currentAudio.pause(); 
+      }, 1400);
+    }
+    
+    currentAudio.play().catch(e => console.log("Audio Error:", e));
+  }
+
+  // === CORE LOGIC ===
   function logBeer() {
+    const prevCount = state.events.length;
     state.events.push(Date.now());
     save();
     
-    playSound();
+    // Play next random sound
+    playGlobalSound(AUDIO.playlist[state.soundIndex % AUDIO.playlist.length]);
+    state.soundIndex++;
+
     showToast("Logged!");
-    checkMilestone();
     
-    // Visuals
-    const wrap = document.getElementById("mainWrap");
-    wrap.style.transform = "translate(2px, 2px)";
-    setTimeout(() => wrap.style.transform = "none", 100);
+    // Check for Badge Unlock
+    const newCount = state.events.length;
+    const badge = BADGES.find(b => prevCount < b.req && newCount >= b.req);
+    if(badge) {
+      triggerBadgePopup(badge);
+    }
     
+    // Hide Hint
     document.getElementById("hint").classList.add("hidden");
   }
 
-  function undo() {
-    if(state.events.length === 0) return;
-    state.events.pop();
-    save();
-    showToast("Undo successful");
-  }
-
   function reset() {
-    if(confirm("Close out the tab and clear history?")) {
+    if(confirm("Empty the trash? This clears all history.")) {
+      playGlobalSound(AUDIO.trash);
       state.events = [];
       save();
       updateUI();
@@ -360,109 +330,78 @@
     updateUI();
   }
 
-  // === UI UPDATES ===
   function updateUI() {
     document.getElementById("count").textContent = state.events.length;
     renderPile();
-    updateStats();
   }
 
   function renderPile() {
     const pile = document.getElementById("beerPile");
     pile.innerHTML = "";
-    // Show max 30 to keep performance up
     const limit = Math.min(state.events.length, 30);
-    
     for(let i=0; i<limit; i++) {
       const img = document.createElement("img");
       img.src = "assets/img/Mug.png";
       img.className = "pileItem";
-      // RANDOM ROTATION for "messy" look
-      const rot = Math.floor(Math.random() * 60) - 30; // -30 to 30 deg
-      img.style.transform = `rotate(${rot}deg)`;
+      img.style.transform = `rotate(${Math.random()*60 - 30}deg)`;
       pile.appendChild(img);
     }
   }
 
-  function updateStats() {
-    const events = state.events;
-    const paceEl = document.getElementById("paceStat");
-    const sessEl = document.getElementById("sessionStat");
-
-    if (events.length < 2) {
-      paceEl.textContent = "Pace: -";
-      sessEl.textContent = "Session: 0m";
-      return;
-    }
-
-    // Sort just in case
-    events.sort((a,b) => a-b);
+  // === BADGES & MODALS ===
+  function triggerBadgePopup(badge) {
+    const overlay = document.getElementById("badgeOverlay");
+    const gif = document.getElementById("badgeGif");
+    const text = document.getElementById("badgeText");
     
-    const first = events[0];
-    const last = events[events.length - 1];
-    const durationHrs = Math.max(0.01, (last - first) / 3600000);
+    // Logic: Case King gets swim gif, others get standard
+    const isSwim = badge.req === 24; 
+    gif.src = isSwim ? "assets/img/SC-swim.gif" : "assets/img/SC-Beers.gif";
+    text.textContent = badge.name.toUpperCase() + " UNLOCKED!";
     
-    const bph = (events.length / durationHrs).toFixed(1);
-    paceEl.textContent = `Pace: ${bph}/hr`;
-
-    // Session duration
-    const now = Date.now();
-    const diffMins = Math.floor((now - first) / 60000);
-    const h = Math.floor(diffMins / 60);
-    const m = diffMins % 60;
-    sessEl.textContent = `Session: ${h}h ${m}m`;
+    setTimeout(() => {
+        overlay.classList.remove("hidden");
+        setTimeout(() => overlay.classList.add("hidden"), 3000);
+    }, 500); // Slight delay so they hear the sound first
   }
 
-  // === RECEIPT LOGIC ===
-  function showReceipt() {
-    const modal = document.getElementById("receiptModal");
-    const list = document.getElementById("receiptItems");
-    const dateEl = document.getElementById("receiptDate");
-    const totalEl = document.getElementById("receiptTotal");
-    
-    modal.classList.add("show");
+  function openBadges() {
+    const list = document.getElementById("badgeList");
     list.innerHTML = "";
-    
-    // Set Date
-    const now = new Date();
-    dateEl.textContent = now.toLocaleDateString() + " " + now.toLocaleTimeString();
-
-    // Fill Items
-    let total = 0;
-    state.events.forEach((ts, index) => {
-      const d = new Date(ts);
-      const timeStr = d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-      
-      const row = document.createElement("div");
-      row.className = "receipt-row";
-      row.innerHTML = `<span>Beer #${index+1}</span> <span>${timeStr}</span>`;
-      list.appendChild(row);
-      total += 5; // Assume $5 per beer
+    BADGES.forEach(b => {
+      const locked = state.events.length < b.req;
+      list.innerHTML += `
+        <div class="badge-card ${locked ? 'locked' : ''}">
+          <div class="badge-name">${b.name}</div>
+          <div class="badge-desc">${locked ? 'Locked ('+b.req+')' : b.desc}</div>
+        </div>
+      `;
     });
-
-    totalEl.textContent = "$" + total.toFixed(2);
+    document.getElementById("badgesModal").classList.add("show");
   }
 
-  // === ANIMATION & AUDIO ===
-  function playSound() {
-    const src = AUDIO.playlist[state.soundIndex % AUDIO.playlist.length];
-    const a = new Audio(src);
-    a.volume = 1.0;
-    // Trim clink sound
-    if(src.includes("clinks")) setTimeout(() => a.pause(), 1400);
-    a.play().catch(()=>{});
-    state.soundIndex++;
+  function openReceipt() {
+    const list = document.getElementById("receiptItems");
+    list.innerHTML = "";
+    let total = 0;
+    document.getElementById("receiptDate").textContent = new Date().toLocaleString();
+    
+    state.events.forEach((ts, i) => {
+      const date = new Date(ts);
+      const time = date.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+      list.innerHTML += `
+        <div class="receipt-row">
+          <span>Beer #${i+1}</span>
+          <span>${time}</span>
+        </div>`;
+      total += 5;
+    });
+    document.getElementById("receiptTotal").textContent = "$" + total.toFixed(2);
+    document.getElementById("receiptModal").classList.add("show");
   }
 
-  function checkMilestone() {
-    const c = state.events.length;
-    if(c > 0 && c % 5 === 0) {
-      const gif = document.getElementById("milestoneGif");
-      const modal = document.getElementById("milestone");
-      gif.src = (c % 10 === 0) ? "assets/img/SC-Beers.gif" : "assets/img/SC-swim.gif";
-      modal.classList.remove("hidden");
-      setTimeout(() => modal.classList.add("hidden"), 2500);
-    }
+  function closeModals() {
+    document.querySelectorAll(".modal-backdrop").forEach(el => el.classList.remove("show"));
   }
 
   function showToast(msg) {
@@ -472,9 +411,8 @@
     setTimeout(() => t.classList.remove("show"), 1500);
   }
 
-  // === DRAG / HOLD INTERACTION ===
-  let holdTimer = null;
-  let isDraining = false;
+  // === INTERACTION (Drag/Hold) ===
+  let holdTimer = null, isDraining = false;
   const container = document.getElementById("beerContainer");
   const mask = document.getElementById("beerMask");
 
@@ -483,22 +421,19 @@
     container.style.transition = "none";
     container.style.height = "100%";
     mask.style.opacity = "1";
-
+    
     holdTimer = setTimeout(() => {
       isDraining = true;
       container.style.transition = "height 0.9s ease-in";
       container.style.height = "0%";
-      setTimeout(() => {
-        logBeer();
-        mask.style.opacity = "0";
-      }, 900);
+      setTimeout(() => { logBeer(); mask.style.opacity = "0"; }, 900);
     }, 250);
   }
 
   function endHold() {
     clearTimeout(holdTimer);
     if(!isDraining) {
-      logBeer(); // Tapped
+      logBeer();
       mask.style.opacity = "0";
     }
   }
@@ -510,26 +445,24 @@
   mug.addEventListener("mouseup", endHold);
   mug.addEventListener("touchend", (e) => { e.preventDefault(); endHold(); });
 
-  document.getElementById("viewTabBtn").addEventListener("click", showReceipt);
-  document.getElementById("closeReceipt").addEventListener("click", () => {
-    document.getElementById("receiptModal").classList.remove("show");
+  // Vape Listener
+  document.getElementById("vapeBtn").addEventListener("click", () => {
+    playGlobalSound(AUDIO.roach);
   });
-
-  document.getElementById("resetBtn").addEventListener("click", reset);
-  document.getElementById("undoBtn").addEventListener("click", undo);
   
+  // Trash Listener
+  document.getElementById("trashBtn").addEventListener("click", reset);
+
   // Intro
   const intro = document.getElementById("intro");
   intro.addEventListener("click", () => {
-    new Audio(AUDIO.intro).play().catch(()=>{});
+    playGlobalSound(AUDIO.intro);
     intro.style.opacity = "0";
     setTimeout(() => intro.classList.add("hidden"), 500);
   });
 
-  // Run
   init();
 
 </script>
 </body>
 </html>
-
