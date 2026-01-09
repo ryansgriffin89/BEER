@@ -12,18 +12,39 @@
       --foam: rgba(255,255,255,0.95);
     }
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    html, body { height: 100%; margin: 0; overflow: hidden; background: #0b0d10; font-family: system-ui, sans-serif; touch-action: manipulation; }
+    
+    html, body { 
+      height: 100%; 
+      margin: 0; 
+      overflow: hidden; 
+      font-family: system-ui, sans-serif; 
+      touch-action: manipulation; 
+      background: #0b0d10; /* Fallback color */
+    }
 
-    /* Background */
+    /* --- Background Fix --- */
     .bg {
-      position: fixed; inset: 0; z-index: -2;
-      background: radial-gradient(circle at 50% 10%, rgba(247,201,72,0.1), transparent 50%), url("assets/img/Background.png");
-      background-size: cover; background-position: center; filter: saturate(1.1) brightness(0.8);
+      position: fixed; 
+      inset: 0; 
+      z-index: 0; /* Brought forward from -2 */
+      background-color: #0b0d10;
+      /* Split this up to be safer */
+      background-image: 
+        radial-gradient(circle at 50% 10%, rgba(247,201,72,0.1), transparent 50%), 
+        url("assets/img/Background.png");
+      background-size: cover; 
+      background-position: center; 
+      filter: saturate(1.1) brightness(0.8);
     }
 
     .wrap {
-      width: min(600px, 100%); margin: 0 auto; height: 100vh;
-      display: flex; flex-direction: column; position: relative;
+      width: min(600px, 100%); 
+      margin: 0 auto; 
+      height: 100vh;
+      display: flex; 
+      flex-direction: column; 
+      position: relative;
+      z-index: 1; /* Content sits on top of bg */
     }
 
     /* Top Stats Bar */
@@ -230,7 +251,7 @@
 
 <script>
   // === CONFIG ===
-  const STORAGE_KEY = "drunkRyan_v6_fixed"; // New key to fix the "100" bug
+  const STORAGE_KEY = "drunkRyan_v6_fixed"; 
   
   // Audio Config
   const AUDIO = {
@@ -267,14 +288,13 @@
     const saved = localStorage.getItem(STORAGE_KEY);
     if(saved) {
       state = JSON.parse(saved);
-      // Safety check: if count is absurdly high from a glitch, reset it
       if(!Array.isArray(state.events)) state.events = [];
     }
     updateUI();
     if(state.events.length > 0) document.getElementById("hint").classList.add("hidden");
   }
 
-  // === AUDIO ENGINE (INTERRUPT LOGIC) ===
+  // === AUDIO ENGINE ===
   function playGlobalSound(src, vol = 1.0) {
     if(currentAudio) {
       currentAudio.pause();
