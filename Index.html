@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Beer Tracker</title>
+  <style>
+    :root{
+      --bg:#0f1115;
+      --card:#171a21;
+      --text:#f4f5f7;
+      --muted:#aab0bd;
+      --gold:#f7c948;
+      --amber:#c97c1a;
+      --foam:#fff2cc;
+      --green:#36d399;
+      --danger:#ff5c5c;
+      --radius:18px;
+      --shadow: 0 18px 50px rgba(0,0,0,.45);
+      --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      min-height:100vh;
+      background: radial-gradient(1200px 600px at 50% -100px, rgba(247,201,72,.25), transparent 60%),
+                  radial-gradient(900px 600px at 0% 120%, rgba(54,211,153,.12), transparent 60%),
+                  var(--bg);
+      color:var(--text);
+      font-family:var(--font);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:18px;
+    }
+    .app{
+      width:min(820px, 100%);
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap:16px;
+    }
+    @media (max-width: 840px){
+      .app{grid-template-columns: 1fr; }
+    }
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .header{
+      padding:18px 18px 10px;
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:14px;
+    }
+    h1{
+      margin:0;
+      font-size:22px;
+      letter-spacing:.3px;
+    }
+    .sub{
+      color:var(--muted);
+      font-size:13px;
+      margin-top:6px;
+      line-height:1.35;
+    }
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.1);
+      background: rgba(255,255,255,.04);
+      color:var(--muted);
+      font-size:12px;
+      user-select:none;
+    }
+    .pill strong{ color:var(--text); font-weight:700;}
+    .main{
+      padding: 0 18px 18px;
+    }
+    .controls{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:12px;
+      margin-top:14px;
+    }
+    @media (max-width: 500px){
+      .controls{grid-template-columns: 1fr;}
+    }
+    .btn{
+      appearance:none;
+      border:none;
+      border-radius: 16px;
+      padding:14px 14px;
+      font-weight:800;
+      letter-spacing:.2px;
+      cursor:pointer;
+      color:#141414;
+      background: linear-gradient(180deg, rgba(247,201,72,1), rgba(201,124,26,1));
+      box-shadow: 0 18px 40px rgba(247,201,72,.14);
+      transition: transform .08s ease, filter .08s ease;
+      user-select:none;
+    }
+    .btn:active{ transform: translateY(2px) scale(.99); filter: brightness(.95); }
+    .btn.secondary{
+      color:var(--text);
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.12);
+      box-shadow:none;
+      font-weight:700;
+    }
+    .btn.danger{
+      color: #fff;
+      background: rgba(255,92,92,.18);
+      border:1px solid rgba(255,92,92,.35);
+    }
+
+    /* Scene */
+    .scene{
+      position:relative;
+      height: 340px;
+      border-radius: 18px;
+      background:
+        radial-gradient(1000px 280px at 50% 120%, rgba(0,0,0,.7), transparent 60%),
+        linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      border: 1px solid rgba(255,255,255,.08);
+      overflow:hidden;
+      margin-top:12px;
+    }
+    .barrel{
+      position:absolute;
+      bottom: 18px;
+      right: 18px;
+      width: 160px;
+      height: 160px;
+      border-radius: 22px;
+      background:
+        linear-gradient(180deg, rgba(0,0,0,.35), rgba(0,0,0,.15)),
+        radial-gradient(120px 120px at 50% 10%, rgba(255,255,255,.06), transparent 55%),
+        linear-gradient(90deg, rgba(201,124,26,.95), rgba(120,63,14,.95));
+      border: 1px solid rgba(255,255,255,.12);
+      box-shadow: 0 30px 70px rgba(0,0,0,.55);
+    }
+    .barrel:before{
+      content:"";
+      position:absolute;
+      inset: 16px;
+      border-radius: 16px;
+      border: 2px dashed rgba(255,255,255,.18);
+    }
+    .barrel-label{
+      position:absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-weight:900;
+      letter-spacing:.8px;
+      font-size:12px;
+      color: rgba(255,255,255,.85);
+      text-shadow: 0 2px 14px rgba(0,0,0,.6);
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(0,0,0,.25);
+      border: 1px solid rgba(255,255,255,.12);
+      user-select:none;
+    }
+
+    .counter-wrap{
+      display:flex;
+      gap:12px;
+      align-items:center;
+      margin-top:12px;
+    }
+    .count{
+      font-size:56px;
+      font-weight:900;
+      letter-spacing:-1px;
+      line-height:1;
+      background: linear-gradient(180deg, rgba(255,255,255,.95), rgba(247,201,72,.92));
+      -webkit-background-clip:text;
+      background-clip:text;
+      color: transparent;
+    }
+    .count-meta{
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.35;
+    }
+
+    /* Bottle + foam animation */
+    .bottle{
+      position:absolute;
+      left: 20px;
+      bottom: 30px;
+      width: 62px;
+      height: 170px;
+      transform-origin: 50% 90%;
+      filter: drop-shadow(0 16px 14px rgba(0,0,0,.45));
+    }
+    .bottle .neck{
+      position:absolute;
+      top: 0;
+      left: 50%;
+      width: 28px;
+      height: 45px;
+      transform: translateX(-50%);
+      border-radius: 10px;
+      background: linear-gradient(180deg, rgba(24,90,45,.95), rgba(10,45,22,.95));
+      border: 1px solid rgba(255,255,255,.12);
+    }
+    .bottle .body{
+      position:absolute;
+      top: 35px;
+      left: 50%;
+      width: 62px;
+      height: 135px;
+      transform: translateX(-50%);
+      border-radius: 18px 18px 20px 20px;
+      background: linear-gradient(180deg, rgba(34,120,62,.95), rgba(10,45,22,.95));
+      border: 1px solid rgba(255,255,255,.12);
+      overflow:hidden;
+    }
+    .bottle .label{
+      position:absolute;
+      left: 50%;
+      top: 54px;
+      transform: translateX(-50%);
+      width: 44px;
+      height: 52px;
+      border-radius: 12px;
+      background: linear-gradient(180deg, rgba(247,201,72,.95), rgba(201,124,26,.95));
+      border: 1px solid rgba(255,255,255,.2);
+      box-shadow: inset 0 0 0 2px rgba(0,0,0,.08);
+    }
+    .bottle .label:after{
+      content:"🍺";
+      position:absolute;
+      inset:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:22px;
+      filter: drop-shadow(0 3px 2px rgba(0,0,0,.2));
+    }
+    .foam-pop{
+      position:absolute;
+      left: 34px;
+      bottom: 190px;
+      width: 14px;
+      height: 14px;
+      border-radius: 999px;
+      background: var(--foam);
+      opacity:0;
+      filter: drop-shadow(0 10px 8px rgba(0,0,0,.25));
+    }
+    .foam-pop::before, .foam-pop::after{
+      content:"";
+      position:absolute;
+      width: 12px;
+      height: 12px;
+      border-radius: 999px;
+      background: var(--foam);
+      top: -10px;
+      left: -8px;
+      opacity:.9;
+    }
+    .foam-pop::after{
+      top: -4px;
+      left: 10px;
+      width: 10px;
+      height: 10px;
+      opacity:.85;
+    }
+
+    /* Toss anim */
+    @keyframes toss {
+      0%   { transform: translate(0,0) rotate(0deg) scale(1); }
+      20%  { transform: translate(120px,-80px) rotate(60deg) scale(1.02); }
+      55%  { transform: translate(320px,-140px) rotate(160deg) scale(1.0); }
+      100% { transform: translate(520px,40px) rotate(240deg) scale(.92); opacity: 0; }
+    }
+    @keyframes foam {
+      0% { opacity:0; transform: translateY(0) scale(.6); }
+      15%{ opacity:1; transform: translateY(-16px) scale(1); }
+      100%{ opacity:0; transform: translateY(-70px) scale(1.25); }
+    }
+    @keyframes thump {
+      0%{ transform: translateX(0) scale(1); }
+      40%{ transform: translateX(0) scale(1.03); }
+      100%{ transform: translateX(0) scale(1); }
+    }
+    .tossing{ animation: toss 820ms cubic-bezier(.12,.76,.22,1) forwards; }
+    .foaming{ animation: foam 650ms ease-out forwards; }
+    .thump{ animation: thump 240ms ease-out; }
+
+    /* Right card */
+    .side{
+      display:flex;
+      flex-direction:column;
+    }
+    .section{
+      padding:16px 18px;
+      border-top:1px solid rgba(255,255,255,.06);
+    }
+    .section h2{
+      margin:0;
+      font-size:14px;
+      letter-spacing:.2px;
+      color:rgba(255,255,255,.9);
+    }
+    .row{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      margin-top:10px;
+      flex-wrap:wrap;
+    }
+    .input{
+      flex:1;
+      min-width: 180px;
+      padding:12px 12px;
+      border-radius: 14px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.18);
+      color: var(--text);
+      outline:none;
+    }
+    .toggle{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      color:var(--muted);
+      font-size:13px;
+      user-select:none;
+    }
+    .toggle input{ transform: scale(1.1); }
+    .log{
+      max-height: 280px;
+      overflow:auto;
+      padding-right:6px;
+      margin-top:10px;
+    }
+    .log-item{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      padding:10px 12px;
+      border-radius: 14px;
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.03);
+      margin-bottom:8px;
+    }
+    .log-item .name{
+      font-weight:700;
+      font-size:13px;
+    }
+    .log-item .time{
+      color: var(--muted);
+      font-size:12px;
+      white-space:nowrap;
+    }
+    .small{
+      color:var(--muted);
+      font-size:12px;
+      margin-top:8px;
+      line-height:1.35;
+    }
+    .toast{
+      position:fixed;
+      left:50%;
+      bottom:18px;
+      transform: translateX(-50%);
+      padding:10px 12px;
+      border-radius: 999px;
+      background: rgba(0,0,0,.65);
+      border:1px solid rgba(255,255,255,.14);
+      color: rgba(255,255,255,.92);
+      font-size: 13px;
+      opacity:0;
+      pointer-events:none;
+      transition: opacity .25s ease, transform .25s ease;
+    }
+    .toast.show{
+      opacity:1;
+      transform: translateX(-50%) translateY(-6px);
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <!-- Left: Main -->
+    <div class="card">
+      <div class="header">
+        <div>
+          <h1>Beer Tracker 🍻</h1>
+          <div class="sub">Tap <b>Add Beer</b> every time you crack one. Plays your sound + does a bottle toss animation.</div>
+        </div>
+        <div class="pill">Total: <strong id="pillCount">0</strong></div>
+      </div>
+
+      <div class="main">
+        <div class="counter-wrap">
+          <div class="count" id="count">0</div>
+          <div class="count-meta">
+            beers logged today<br/>
+            <span id="todayDate"></span>
+          </div>
+        </div>
+
+        <div class="scene" id="scene">
+          <div class="foam-pop" id="foam"></div>
+
+          <div class="bottle" id="bottle">
+            <div class="neck"></div>
+            <div class="body">
+              <div class="label"></div>
+            </div>
+          </div>
+
+          <div class="barrel" id="barrel">
+            <div class="barrel-label">BOTTLE BARREL</div>
+          </div>
+        </div>
+
+        <div class="controls">
+          <button class="btn" id="addBtn">+ Add Beer</button>
+          <button class="btn secondary" id="undoBtn">Undo</button>
+          <button class="btn secondary" id="exportBtn">Export Log</button>
+          <button class="btn danger" id="resetBtn">Reset Today</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Settings + Log -->
+    <div class="card side">
+      <div class="header">
+        <div>
+          <h1 style="font-size:18px;margin:0;">Settings</h1>
+          <div class="sub">Name the beer + upload your audio. Your phone may require one tap before audio can play.</div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>Beer Name</h2>
+        <div class="row">
+          <input class="input" id="beerName" placeholder="e.g., Lone Star, Shiner, Miller Lite…" />
+        </div>
+        <div class="small">Tip: leave blank and it’ll log as “Beer”.</div>
+      </div>
+
+      <div class="section">
+        <h2>Sound</h2>
+        <div class="row">
+          <input class="input" id="soundFile" type="file" accept="audio/*" />
+          <button class="btn secondary" id="testSoundBtn" style="padding:12px 14px;">Test Sound</button>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="soundEnabled" checked />
+          Play sound on tap
+        </label>
+        <div class="small">
+          Upload any <b>.mp3</b> or <b>.wav</b> (like a recording of “Billy Bobs!” + bottle toss). The app stores it in memory for this session.
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>Log</h2>
+        <div class="log" id="log"></div>
+        <div class="small" id="logHint">No beers logged yet.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast">🍺 Logged!</div>
+
+  <script>
+    // ---- Storage (per-day) ----
+    const keyForToday = () => {
+      const d = new Date();
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth()+1).padStart(2,'0');
+      const dd = String(d.getDate()).padStart(2,'0');
+      return `beerTracker:${yyyy}-${mm}-${dd}`;
+    };
+
+    const state = {
+      count: 0,
+      log: [],
+      soundUrl: null,
+      audio: null
+    };
+
+    // ---- Elements ----
+    const countEl = document.getElementById('count');
+    const pillCountEl = document.getElementById('pillCount');
+    const todayDateEl = document.getElementById('todayDate');
+    const logEl = document.getElementById('log');
+    const logHintEl = document.getElementById('logHint');
+
+    const addBtn = document.getElementById('addBtn');
+    const undoBtn = document.getElementById('undoBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const exportBtn = document.getElementById('exportBtn');
+
+    const beerNameEl = document.getElementById('beerName');
+    const soundFileEl = document.getElementById('soundFile');
+    const soundEnabledEl = document.getElementById('soundEnabled');
+    const testSoundBtn = document.getElementById('testSoundBtn');
+
+    const bottleEl = document.getElementById('bottle');
+    const foamEl = document.getElementById('foam');
+    const barrelEl = document.getElementById('barrel');
+    const toastEl = document.getElementById('toast');
+
+    // ---- Helpers ----
+    function formatNow(){
+      const d = new Date();
+      return d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+    }
+
+    function setTodayLabel(){
+      const d = new Date();
+      todayDateEl.textContent = d.toLocaleDateString([], { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' });
+    }
+
+    function showToast(text){
+      toastEl.textContent = text;
+      toastEl.classList.add('show');
+      setTimeout(() => toastEl.classList.remove('show'), 900);
+    }
+
+    function save(){
+      localStorage.setItem(keyForToday(), JSON.stringify({ count: state.count, log: state.log }));
+    }
+
+    function load(){
+      const raw = localStorage.getItem(keyForToday());
+      if(!raw) return;
+      try{
+        const data = JSON.parse(raw);
+        state.count = data.count || 0;
+        state.log = Array.isArray(data.log) ? data.log : [];
+      }catch(e){}
+    }
+
+    function render(){
+      countEl.textContent = state.count;
+      pillCountEl.textContent = state.count;
+
+      logEl.innerHTML = "";
+      if(state.log.length === 0){
+        logHintEl.textContent = "No beers logged yet.";
+      }else{
+        logHintEl.textContent = "";
+      }
+
+      // newest first
+      [...state.log].reverse().forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'log-item';
+        div.innerHTML = `
+          <div>
+            <div class="name">${escapeHtml(item.name)}</div>
+          </div>
+          <div class="time">${escapeHtml(item.time)}</div>
+        `;
+        logEl.appendChild(div);
+      });
+    }
+
+    function escapeHtml(str){
+      return String(str).replace(/[&<>"']/g, s => ({
+        '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+      }[s]));
+    }
+
+    // ---- Animation ----
+    function doAnimation(){
+      // foam burst
+      foamEl.classList.remove('foaming');
+      void foamEl.offsetWidth; // reflow
+      foamEl.classList.add('foaming');
+
+      // toss bottle clone so the original stays in place
+      const clone = bottleEl.cloneNode(true);
+      clone.style.left = bottleEl.getBoundingClientRect().left + "px";
+      clone.style.bottom = "30px";
+      clone.style.position = "absolute";
+      clone.style.left = "20px";
+      clone.style.bottom = "30px";
+      clone.classList.add('tossing');
+      document.getElementById('scene').appendChild(clone);
+
+      // barrel thump
+      barrelEl.classList.remove('thump');
+      void barrelEl.offsetWidth;
+      barrelEl.classList.add('thump');
+
+      clone.addEventListener('animationend', () => clone.remove());
+    }
+
+    // ---- Sound ----
+    async function playSound(){
+      if(!soundEnabledEl.checked) return;
+
+      // If user didn't upload a sound, do a tiny fallback "click" beep using WebAudio
+      if(!state.soundUrl){
+        try{
+          const ctx = new (window.AudioContext || window.webkitAudioContext)();
+          const o = ctx.createOscillator();
+          const g = ctx.createGain();
+          o.type = "square";
+          o.frequency.value = 220;
+          g.gain.value = 0.06;
+          o.connect(g); g.connect(ctx.destination);
+          o.start();
+          setTimeout(() => { o.stop(); ctx.close(); }, 90);
+        }catch(e){}
+        return;
+      }
+
+      if(!state.audio){
+        state.audio = new Audio(state.soundUrl);
+      }
+      try{
+        state.audio.currentTime = 0;
+        await state.audio.play();
+      }catch(e){
+        // Mobile browsers may block autoplay until a user gesture
+        showToast("Tap once more to enable audio 🔊");
+      }
+    }
+
+    soundFileEl.addEventListener('change', () => {
+      const file = soundFileEl.files?.[0];
+      if(!file) return;
+      if(state.soundUrl) URL.revokeObjectURL(state.soundUrl);
+      state.soundUrl = URL.createObjectURL(file);
+      state.audio = new Audio(state.soundUrl);
+      showToast("Sound loaded ✅");
+    });
+
+    testSoundBtn.addEventListener('click', async () => {
+      await playSound();
+    });
+
+    // ---- Actions ----
+    function addBeer(){
+      const name = (beerNameEl.value || "").trim() || "Beer";
+      state.count += 1;
+      state.log.push({ name, time: formatNow() });
+      save();
+      render();
+      doAnimation();
+      playSound();
+      showToast("🍺 Logged!");
+    }
+
+    function undo(){
+      if(state.count <= 0 || state.log.length === 0){
+        showToast("Nothing to undo");
+        return;
+      }
+      state.count -= 1;
+      state.log.pop();
+      save();
+      render();
+      showToast("Undid last beer");
+    }
+
+    function resetToday(){
+      if(!confirm("Reset today's count + log?")) return;
+      state.count = 0;
+      state.log = [];
+      save();
+      render();
+      showToast("Reset ✅");
+    }
+
+    function exportLog(){
+      const payload = {
+        date: new Date().toLocaleDateString(),
+        count: state.count,
+        log: state.log
+      };
+      const text = JSON.stringify(payload, null, 2);
+      navigator.clipboard?.writeText(text).then(() => {
+        showToast("Copied log to clipboard 📋");
+      }).catch(() => {
+        // fallback download
+        const blob = new Blob([text], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = "beer-log.json";
+        a.click();
+        URL.revokeObjectURL(url);
+        showToast("Downloaded beer-log.json");
+      });
+    }
+
+    addBtn.addEventListener('click', addBeer);
+    undoBtn.addEventListener('click', undo);
+    resetBtn.addEventListener('click', resetToday);
+    exportBtn.addEventListener('click', exportLog);
+
+    // ---- Init ----
+    setTodayLabel();
+    load();
+    render();
+  </script>
+</body>
+            </html>
