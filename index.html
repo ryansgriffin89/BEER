@@ -3,17 +3,17 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Drunk Ryan's Counter</title>
+  <title>Drunk Ryan’s Counter</title>
 
   <style>
     :root{
       --radius: 22px;
       --shadow: 0 18px 60px rgba(0,0,0,.55);
+      --glass: rgba(0,0,0,.42);
       --border: rgba(255,255,255,.12);
-      --text: rgba(255,255,255,.95);
-      --muted: rgba(255,255,255,.72);
+      --text: rgba(255,255,255,.94);
+      --muted: rgba(255,255,255,.70);
       --gold: #f7c948;
-      --glass: rgba(0,0,0,.40);
     }
 
     *{ box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
@@ -24,7 +24,7 @@
       color: var(--text);
       background: #0b0d10;
       overflow:hidden;
-      touch-action: none;
+      touch-action: manipulation;
     }
 
     /* Background */
@@ -32,14 +32,14 @@
       position: fixed;
       inset: 0;
       background:
-        radial-gradient(900px 520px at 18% 10%, rgba(247,201,72,.14), transparent 60%),
-        radial-gradient(800px 480px at 86% 22%, rgba(255,70,70,.10), transparent 60%),
-        linear-gradient(rgba(0,0,0,.58), rgba(0,0,0,.80)),
+        radial-gradient(900px 520px at 16% 10%, rgba(247,201,72,.12), transparent 60%),
+        radial-gradient(900px 520px at 88% 22%, rgba(255,90,90,.10), transparent 60%),
+        linear-gradient(rgba(0,0,0,.56), rgba(0,0,0,.80)),
         url("assets/img/Background.png");
       background-size: cover;
       background-position: center;
       filter: saturate(1.08) contrast(1.06);
-      transform: scale(1.03);
+      transform: scale(1.02);
       z-index: -2;
     }
 
@@ -73,7 +73,7 @@
       letter-spacing: 1.3px;
       text-transform: uppercase;
       color: var(--gold);
-      text-shadow: 0 0 18px rgba(247,201,72,.28);
+      text-shadow: 0 0 18px rgba(247,201,72,.25);
     }
     .title p{
       margin: 6px 0 0;
@@ -88,20 +88,20 @@
       align-items:center;
       margin-left:auto;
     }
-    .iconBtn{
+    .btn{
       border:1px solid rgba(255,255,255,.14);
-      background: rgba(0,0,0,.22);
+      background: rgba(0,0,0,.24);
       color: rgba(255,255,255,.92);
       border-radius: 14px;
       padding: 8px 10px;
       font-size: 12px;
-      letter-spacing: .6px;
+      letter-spacing: .8px;
       text-transform: uppercase;
       cursor:pointer;
       backdrop-filter: blur(6px);
       box-shadow: 0 12px 30px rgba(0,0,0,.35);
     }
-    .iconBtn:active{ transform: scale(.98); }
+    .btn:active{ transform: scale(.98); }
 
     .countBox{ text-align:right; min-width: 120px; }
     #count{
@@ -112,7 +112,7 @@
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
-      text-shadow: 0 10px 40px rgba(0,0,0,.4);
+      text-shadow: 0 10px 40px rgba(0,0,0,.45);
     }
     .countLabel{
       margin-top: 4px;
@@ -141,111 +141,23 @@
       pointer-events:none;
     }
 
-    /* Mug button + pour animation layer */
-    #mugBtn{
-      position:absolute;
-      left: 16px;
-      top: 34px;
-      width: 175px;
-      height: 175px;
+    /* Reset */
+    .resetBtn{
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(255,0,0,0.16);
+      border: 1px solid rgba(255,0,0,0.35);
+      color: rgba(255,255,255,.90);
+      font-size: 10px;
+      padding: 6px 10px;
+      border-radius: 12px;
       cursor: pointer;
-      transition: transform 0.08s;
-      z-index: 5;
-      background: transparent;
-      border: none;
-      padding: 0;
-      border-radius: 24px;
-    }
-    #mugBtn:active{ transform: scale(0.97); }
-
-    .mugWrap{
-      position:relative;
-      width:100%;
-      height:100%;
-    }
-    .mugImg{
-      position:relative;
-      z-index: 3;
-      width:100%;
-      height:100%;
-      object-fit:contain;
-      filter: drop-shadow(0 18px 18px rgba(0,0,0,0.55));
-    }
-
-    /* Fake “beer level” overlay */
-    .beerFill{
-      position:absolute;
-      left: 18%;
-      width: 64%;
-      bottom: 18%;
-      height: 52%;
-      border-radius: 14px;
-      background: linear-gradient(180deg, rgba(247,201,72,.65), rgba(255,170,60,.40));
-      filter: blur(.1px);
-      opacity: 0;
-      z-index: 2;
-      transform: translateZ(0);
-    }
-    .beerFill.active{ opacity: .95; }
-    .beerFill.drain{
-      animation: drain 0.95s ease-in forwards;
-    }
-    @keyframes drain{
-      from{ height: 52%; opacity:.95; }
-      70%{ opacity:.95; }
-      to{ height: 0%; opacity:.0; }
-    }
-
-    .holdHint{
-      position:absolute;
-      left: 16px;
-      top: 220px;
-      font-size: 12px;
-      color: rgba(255,255,255,.72);
-      letter-spacing: .6px;
+      z-index: 30;
+      letter-spacing: 1px;
       text-transform: uppercase;
-      z-index: 6;
-      user-select:none;
+      backdrop-filter: blur(6px);
     }
-
-    /* Bottle decoration (optional) */
-    #bottleDeco{
-      position:absolute;
-      left: 205px;
-      top: 102px;
-      width: 54px;
-      height: 150px;
-      opacity: .92;
-      z-index: 4;
-      pointer-events: none;
-    }
-    #bottleDeco img{
-      width:100%; height:100%;
-      object-fit: contain;
-      filter: drop-shadow(0 12px 12px rgba(0,0,0,0.55));
-    }
-
-    /* Beer pile */
-    #beerPile{
-      position:absolute;
-      left: 12px;
-      bottom: 12px;
-      width: calc(100% - 24px);
-      height: 120px;
-      display: flex;
-      flex-wrap: wrap-reverse;
-      align-content: flex-start;
-      gap: 4px;
-      z-index: 2;
-      pointer-events: none;
-    }
-    .pileItem{
-      width: 30px;
-      height: auto;
-      filter: drop-shadow(0 4px 4px rgba(0,0,0,0.65));
-      animation: popIn 0.28s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-    @keyframes popIn{ from{ transform: scale(0); } to{ transform: scale(1); } }
 
     /* Toast */
     .toast{
@@ -271,6 +183,130 @@
       opacity: 1;
       transform: translateX(-50%) translateY(6px);
     }
+
+    /* Mug button */
+    #mugBtn{
+      position:absolute;
+      left: 16px;
+      top: 28px;
+      width: 180px;
+      height: 180px;
+      border: none;
+      padding: 0;
+      background: transparent;
+      cursor: pointer;
+      z-index: 7;
+      transition: transform 0.08s;
+      border-radius: 26px;
+    }
+    #mugBtn:active{ transform: scale(0.97); }
+
+    .mugWrap{
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Masked beer overlay inside the mug (no new images needed) */
+    #beerMask{
+      position:absolute;
+      /* Tuned for your Mug.png. If you want, tweak these 4 values only. */
+      left: 24%;
+      right: 18%;
+      bottom: 18%;
+      height: 48%;
+      border-radius: 12px;
+      overflow: hidden;
+      z-index: 2;
+      opacity: 0;
+      transition: opacity .15s ease;
+      filter: drop-shadow(0 10px 14px rgba(0,0,0,.30));
+    }
+
+    #beerLiquid{
+      position:absolute;
+      bottom:0;
+      width:100%;
+      height:100%;
+      background:
+        linear-gradient(180deg,
+          rgba(255,220,140,0.96),
+          rgba(255,170,60,0.96)
+        );
+      box-shadow: inset 0 0 12px rgba(255,255,255,0.20);
+      transition: height 0.9s ease;
+    }
+
+    .mugImg{
+      position:relative;
+      z-index: 3;
+      width:100%;
+      height:100%;
+      object-fit:contain;
+      filter: drop-shadow(0 18px 18px rgba(0,0,0,0.55));
+      pointer-events:none;
+      user-select:none;
+    }
+
+    /* Optional decorative bottle */
+    #bottleDeco{
+      position:absolute;
+      left: 214px;
+      top: 100px;
+      width: 56px;
+      height: 150px;
+      opacity: .92;
+      z-index: 4;
+      pointer-events:none;
+    }
+    #bottleDeco img{
+      width:100%; height:100%;
+      object-fit: contain;
+      filter: drop-shadow(0 12px 12px rgba(0,0,0,0.55));
+      user-select:none;
+    }
+
+    /* One-time hint */
+    #hint{
+      position:absolute;
+      left: 16px;
+      top: 214px;
+      font-size: 12px;
+      color: rgba(255,255,255,.72);
+      letter-spacing: .8px;
+      text-transform: uppercase;
+      z-index: 8;
+      user-select:none;
+      background: rgba(0,0,0,.35);
+      border: 1px solid rgba(255,255,255,.10);
+      padding: 8px 10px;
+      border-radius: 14px;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 14px 30px rgba(0,0,0,.40);
+    }
+    #hint.hidden{ display:none; }
+
+    /* Beer pile */
+    #beerPile{
+      position:absolute;
+      left: 12px;
+      bottom: 12px;
+      width: calc(100% - 24px);
+      height: 120px;
+      display:flex;
+      flex-wrap: wrap-reverse;
+      align-content: flex-start;
+      gap: 4px;
+      z-index: 2;
+      pointer-events:none;
+    }
+    .pileItem{
+      width: 30px;
+      height: auto;
+      filter: drop-shadow(0 4px 4px rgba(0,0,0,0.65));
+      animation: popIn 0.28s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    @keyframes popIn{ from{ transform: scale(0); } to{ transform: scale(1); } }
 
     /* Overlays */
     .overlay.hidden{ display:none; }
@@ -303,16 +339,16 @@
       text-align: center;
     }
     .tapToStart{
-      margin-top: 20px;
+      margin-top: 18px;
       font-size: 13px;
-      color: rgba(255,255,255,.70);
+      color: rgba(255,255,255,.74);
       letter-spacing: 1px;
       text-transform: uppercase;
       animation: blink 2s infinite;
     }
     @keyframes blink { 50%{ opacity: 0.55; }}
 
-    /* Modal */
+    /* Modals */
     .modalBackdrop{
       position:fixed; inset:0;
       background: rgba(0,0,0,.78);
@@ -407,30 +443,12 @@
       line-height: 1.25;
     }
 
-    /* Reset */
-    .resetBtn{
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background: rgba(255,0,0,0.16);
-      border: 1px solid rgba(255,0,0,0.35);
-      color: rgba(255,255,255,.90);
-      font-size: 10px;
-      padding: 6px 10px;
-      border-radius: 12px;
-      cursor: pointer;
-      z-index: 30;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      backdrop-filter: blur(6px);
-    }
-
     @media (max-width: 600px){
-      #mugBtn{ width: 148px; height: 148px; top: 28px; left: 10px;}
-      #bottleDeco{ width: 46px; height: 132px; left: 170px; top: 92px;}
+      #mugBtn{ width: 155px; height: 155px; top: 24px; left: 10px;}
+      #bottleDeco{ width: 46px; height: 132px; left: 175px; top: 92px;}
       .title h1{ font-size: 16px; }
       .grid{ grid-template-columns: 1fr; }
-      .holdHint{ top: 200px; left: 10px; font-size: 11px; }
+      #hint{ top: 195px; left: 10px; font-size: 11px; }
     }
   </style>
 </head>
@@ -482,12 +500,12 @@
     <header>
       <div class="title">
         <h1>Drunk Ryan’s Counter</h1>
-        <p>Tap = finished beer • Hold = “drain to empty” finish</p>
+        <p>Tap = finished beer • Hold = drain to empty</p>
       </div>
 
       <div class="headerBtns">
-        <button class="iconBtn" id="statsBtn">Stats</button>
-        <button class="iconBtn" id="badgesBtn">Badges</button>
+        <button class="btn" id="statsBtn">Stats</button>
+        <button class="btn" id="badgesBtn">Badges</button>
       </div>
 
       <div class="countBox">
@@ -500,17 +518,19 @@
       <div id="toast" class="toast">Saved</div>
       <button class="resetBtn" id="resetBtn">Reset</button>
 
-      <button id="mugBtn" aria-label="Log a finished beer">
+      <button id="mugBtn" aria-label="Log finished beer">
         <div class="mugWrap">
-          <div id="beerFill" class="beerFill"></div>
+          <div id="beerMask" aria-hidden="true">
+            <div id="beerLiquid"></div>
+          </div>
           <img class="mugImg" src="assets/img/Mug.png" alt="Mug">
         </div>
       </button>
 
-      <div class="holdHint">Tip: hold the mug to “drain” it</div>
+      <div id="hint">Hold the mug to drain it</div>
 
       <div id="bottleDeco" aria-hidden="true">
-        <img src="assets/img/MT.jpeg" alt="Bottle">
+        <img src="assets/img/MT.png" alt="Bottle">
       </div>
 
       <div id="beerPile"></div>
@@ -519,23 +539,12 @@
 
   <script>
     // ----------------------------
-    // Storage + Data Model
+    // Keys
     // ----------------------------
-    const KEY_EVENTS = "drunkRyanEventsV1"; // array of timestamps (ms)
-    const KEY_AUDIO_UNLOCKED = "drunkRyanAudioUnlockedV1";
-
-    function loadEvents(){
-      try{
-        const raw = localStorage.getItem(KEY_EVENTS);
-        const arr = raw ? JSON.parse(raw) : [];
-        return Array.isArray(arr) ? arr.filter(n => Number.isFinite(n)) : [];
-      }catch(e){
-        return [];
-      }
-    }
-    function saveEvents(events){
-      localStorage.setItem(KEY_EVENTS, JSON.stringify(events));
-    }
+    const KEY_EVENTS = "drunkRyanEventsV2";        // array of timestamps (ms)
+    const KEY_HINT_SEEN = "drunkRyanHintSeenV1";
+    const KEY_SOUND_INDEX = "drunkRyanSoundIndexV1";
+    const KEY_STARTED = "drunkRyanStartedV1";
 
     // ----------------------------
     // Elements
@@ -543,9 +552,14 @@
     const countEl = document.getElementById("count");
     const beerPile = document.getElementById("beerPile");
     const mugBtn = document.getElementById("mugBtn");
-    const beerFill = document.getElementById("beerFill");
     const startupOverlay = document.getElementById("startupOverlay");
+    const milestoneOverlay = document.getElementById("milestoneOverlay");
+    const milestoneGif = document.getElementById("milestoneGif");
+    const milestoneText = document.getElementById("milestoneText");
+    const beerMask = document.getElementById("beerMask");
+    const beerLiquid = document.getElementById("beerLiquid");
     const toastEl = document.getElementById("toast");
+    const hintEl = document.getElementById("hint");
 
     const statsBtn = document.getElementById("statsBtn");
     const badgesBtn = document.getElementById("badgesBtn");
@@ -557,56 +571,49 @@
     const badgesTotalEl = document.getElementById("badgesTotal");
 
     // ----------------------------
-    // Audio (your exact filenames)
+    // Audio
     // ----------------------------
     const INTRO_SRC = "assets/audio/stone-cold-drink-beer.mp3";
 
-    // rotation = everything except intro
     const ROTATION = [
-  "assets/audio/beer-bottle-clinks.mp3",
-  "assets/audio/Bell.mp3",
-  "assets/audio/John-cena.mp3",
-  "assets/audio/SCSA-Theme.mp3",
-  "assets/audio/Unbelievable.mp3",
-  "assets/audio/What.mp3",
-  "assets/audio/gay.mp3",
-  "assets/audio/kill-tony-meow.mp3",
-  "assets/audio/kill-tony-song.mp3",
-  "assets/audio/miller-time.mp3"
-];
+      "assets/audio/beer-bottle-clinks.mp3",
+      "assets/audio/Bell.mp3",
+      "assets/audio/John-cena.mp3",
+      "assets/audio/SCSA-Theme.mp3",
+      "assets/audio/Unbelievable.mp3",
+      "assets/audio/What.mp3",
+      "assets/audio/gay.mp3",
+      "assets/audio/kill-tony-meow.mp3",
+      "assets/audio/kill-tony-song.mp3",
+      "assets/audio/miller-time.mp3"
+    ];
 
-    let soundIndex = 0;
-    let soundChannel = null;
-    let introHasPlayed = false;
-
-    // trim clinks without editing the file
     const CLINKS_MAX_SECONDS = 1.5;
 
-    // mobile unlock helper
+    let introHasPlayed = false;
     let audioCtx = null;
+    let channel = null;
+
+    let soundIndex = (() => {
+      const saved = parseInt(localStorage.getItem(KEY_SOUND_INDEX) || "0", 10);
+      return Number.isFinite(saved) ? (saved % ROTATION.length) : 0;
+    })();
+
     async function unlockAudio(){
       try{
         if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         if(audioCtx.state !== "running") await audioCtx.resume();
       }catch(e){}
-      // prime muted playback (some Android builds need it)
-      try{
-        const a = new Audio();
-        a.muted = true;
-        await a.play().catch(()=>{});
-        a.pause();
-        a.muted = false;
-      }catch(e){}
     }
 
     function stopChannel(){
       try{
-        if(soundChannel){
-          soundChannel.pause();
-          soundChannel.currentTime = 0;
+        if(channel){
+          channel.pause();
+          channel.currentTime = 0;
         }
       }catch(e){}
-      soundChannel = null;
+      channel = null;
     }
 
     async function playIntro(){
@@ -617,19 +624,18 @@
 
       const intro = new Audio(encodeURI(INTRO_SRC));
       intro.volume = 1.0;
-
-      // must occur in user gesture; we call this from pointerdown
       intro.play().catch(()=>{});
 
       startupOverlay.style.opacity = "0";
       setTimeout(() => startupOverlay.classList.add("hidden"), 500);
 
-      // remember we successfully attempted unlock
-      localStorage.setItem(KEY_AUDIO_UNLOCKED, "1");
+      localStorage.setItem(KEY_STARTED, "1");
     }
 
     function ensureStarted(){
-      if(!introHasPlayed) playIntro();
+      // If overlay still visible, user hasn't tapped it yet — don't auto-play intro.
+      // But we still allow app to function without intro.
+      return;
     }
 
     function playRotatingSound(){
@@ -651,13 +657,33 @@
       }
 
       a.play().catch(()=>{});
-      soundChannel = a;
+      channel = a;
 
       soundIndex = (soundIndex + 1) % ROTATION.length;
+      localStorage.setItem(KEY_SOUND_INDEX, String(soundIndex));
     }
 
     // ----------------------------
-    // UI Helpers
+    // Storage
+    // ----------------------------
+    function loadEvents(){
+      try{
+        const raw = localStorage.getItem(KEY_EVENTS);
+        const arr = raw ? JSON.parse(raw) : [];
+        return Array.isArray(arr) ? arr.filter(n => Number.isFinite(n)) : [];
+      }catch(e){
+        return [];
+      }
+    }
+    function saveEvents(events){
+      localStorage.setItem(KEY_EVENTS, JSON.stringify(events));
+    }
+
+    let events = loadEvents();
+    events.sort((a,b)=>a-b);
+
+    // ----------------------------
+    // UI helpers
     // ----------------------------
     function vibrate(ms){
       if(navigator.vibrate) navigator.vibrate(ms);
@@ -678,41 +704,50 @@
       beerPile.appendChild(img);
     }
 
-    // ----------------------------
-    // Stats + Badges
-    // ----------------------------
-    function startOfDay(d){
-      const x = new Date(d);
-      x.setHours(0,0,0,0);
-      return x;
+    function rebuildUI(){
+      countEl.textContent = String(events.length);
+      beerPile.innerHTML = "";
+      const pileCount = Math.min(30, events.length);
+      for(let i=0;i<pileCount;i++) addPileItem(false);
+
+      // one-time hint
+      if(localStorage.getItem(KEY_HINT_SEEN) === "1"){
+        hintEl.classList.add("hidden");
+      }
     }
-    function yyyyMmDd(d){
-      const x = new Date(d);
-      const y = x.getFullYear();
-      const m = String(x.getMonth()+1).padStart(2,"0");
-      const da = String(x.getDate()).padStart(2,"0");
+
+    // ----------------------------
+    // Stats
+    // ----------------------------
+    function yyyyMmDd(t){
+      const d = new Date(t);
+      const y = d.getFullYear();
+      const m = String(d.getMonth()+1).padStart(2,"0");
+      const da = String(d.getDate()).padStart(2,"0");
       return `${y}-${m}-${da}`;
     }
-    function monthKey(d){
-      const x = new Date(d);
-      const y = x.getFullYear();
-      const m = String(x.getMonth()+1).padStart(2,"0");
+    function monthKey(t){
+      const d = new Date(t);
+      const y = d.getFullYear();
+      const m = String(d.getMonth()+1).padStart(2,"0");
       return `${y}-${m}`;
     }
 
-    function computeStats(events){
-      const total = events.length;
-      const now = new Date();
-
-      // MTD
+    function computeStats(ev){
+      const total = ev.length;
+      const now = Date.now();
+      const todayKey = yyyyMmDd(now);
       const thisMonth = monthKey(now);
-      const mtd = events.filter(t => monthKey(t) === thisMonth).length;
 
-      // per-day counts
+      let today = 0;
+      let mtd = 0;
+
       const byDay = new Map();
-      for(const t of events){
-        const key = yyyyMmDd(t);
-        byDay.set(key, (byDay.get(key) || 0) + 1);
+      for(const t of ev){
+        const dKey = yyyyMmDd(t);
+        byDay.set(dKey, (byDay.get(dKey) || 0) + 1);
+        if(dKey === todayKey) today++;
+        if(monthKey(t) === thisMonth) mtd++;
       }
 
       let highestDay = null, highestCount = 0;
@@ -722,52 +757,62 @@
         if(c > highestCount){ highestCount = c; highestDay = day; }
         if(c < lowestCount){ lowestCount = c; lowestDay = day; lowestCount = c; }
       }
+      if(lowestCount === Infinity){ lowestCount = 0; lowestDay = null; }
 
-      // beers per hour (last 4 hours + all-time session-style)
       const FOUR_HOURS_MS = 4 * 3600 * 1000;
-      const last4h = events.filter(t => (Date.now() - t) <= FOUR_HOURS_MS).length;
-      const bphLast4 = (last4h / 4);
+      const last4h = ev.filter(t => (now - t) <= FOUR_HOURS_MS).length;
+      const bphLast4 = last4h / 4;
 
       let bphOverall = 0;
       if(total >= 2){
-        const first = events[0];
-        const last = events[total-1];
+        const first = ev[0];
+        const last = ev[total-1];
         const hours = Math.max(0.01, (last - first) / 3600000);
         bphOverall = total / hours;
       }
 
-      // “Today”
-      const todayKey = yyyyMmDd(now);
-      const today = byDay.get(todayKey) || 0;
-
       return {
-        total,
-        mtd,
-        today,
+        total, today, mtd,
+        bphLast4, bphOverall,
         highestDay, highestCount,
-        lowestDay, lowestCount: (lowestCount === Infinity ? 0 : lowestCount),
-        bphLast4,
-        bphOverall
+        lowestDay, lowestCount
       };
     }
 
+    function renderStats(){
+      const s = computeStats(events);
+      const lines = [
+        `<div class="statLine"><b>Total logged:</b> ${s.total}</div>`,
+        `<div class="statLine"><b>Beers today:</b> ${s.today}</div>`,
+        `<div class="statLine"><b>Beers MTD:</b> ${s.mtd}</div>`,
+        `<div class="statLine"><b>Beers/hr (last 4 hrs):</b> ${s.bphLast4.toFixed(2)}</div>`,
+        `<div class="statLine"><b>Beers/hr (overall):</b> ${s.bphOverall.toFixed(2)}</div>`,
+        `<div class="statLine"><b>Highest volume day:</b> ${s.highestDay ? `${s.highestDay} (${s.highestCount})` : "—"}</div>`,
+        `<div class="statLine"><b>Lowest volume day:</b> ${s.lowestDay ? `${s.lowestDay} (${s.lowestCount})` : "—"}</div>`
+      ];
+      statsBody.innerHTML = lines.join("");
+    }
+
+    // ----------------------------
+    // Badges
+    // ----------------------------
     const BADGES = [
-      { id:"b1",  req:1,  name:"First Sip", desc:"You logged your first beer." },
-      { id:"b5",  req:5,  name:"First Round", desc:"5 logged beers." },
-      { id:"b10", req:10, name:"Buzzed", desc:"10 logged beers." },
-      { id:"b24", req:24, name:"Case King", desc:"24 logged beers. Absolute legend." },
-      { id:"b25", req:25, name:"Stone Cold Certified", desc:"HELL YEAH status." },
-      { id:"b50", req:50, name:"Regular", desc:"50 logged beers." },
-      { id:"b100",req:100,name:"Bar Fixture", desc:"100 logged beers." }
+      { id:"b1",   req:1,   name:"First Sip", desc:"You logged your first beer." },
+      { id:"b5",   req:5,   name:"First Round", desc:"5 logged beers." },
+      { id:"b10",  req:10,  name:"Buzzed", desc:"10 logged beers." },
+      { id:"b24",  req:24,  name:"Case King", desc:"24 logged beers. Absolute legend." },
+      { id:"b25",  req:25,  name:"Stone Cold Certified", desc:"HELL YEAH status." },
+      { id:"b50",  req:50,  name:"Regular", desc:"50 logged beers." },
+      { id:"b100", req:100, name:"Bar Fixture", desc:"100 logged beers." }
     ];
 
-    function unlockedBadges(total){
+    function unlockedSet(total){
       return new Set(BADGES.filter(b => total >= b.req).map(b => b.id));
     }
 
-    function renderBadges(events){
+    function renderBadges(){
       const total = events.length;
-      const unlocked = unlockedBadges(total);
+      const unlocked = unlockedSet(total);
 
       badgesUnlockedEl.textContent = String(unlocked.size);
       badgesTotalEl.textContent = String(BADGES.length);
@@ -786,38 +831,23 @@
       }
     }
 
-    function renderStats(events){
-      const s = computeStats(events);
-
-      const lines = [
-        `<div class="statLine"><b>Total logged:</b> ${s.total}</div>`,
-        `<div class="statLine"><b>Beers today:</b> ${s.today}</div>`,
-        `<div class="statLine"><b>Beers MTD:</b> ${s.mtd}</div>`,
-        `<div class="statLine"><b>Beers/hr (last 4 hrs):</b> ${s.bphLast4.toFixed(2)}</div>`,
-        `<div class="statLine"><b>Beers/hr (overall):</b> ${s.bphOverall.toFixed(2)}</div>`,
-        `<div class="statLine"><b>Highest volume day:</b> ${s.highestDay ? `${s.highestDay} (${s.highestCount})` : "—"}</div>`,
-        `<div class="statLine"><b>Lowest volume day:</b> ${s.lowestDay ? `${s.lowestDay} (${s.lowestCount})` : "—"}</div>`
-      ];
-
-      statsBody.innerHTML = lines.join("");
+    // ----------------------------
+    // Milestones every 5 beers
+    // ----------------------------
+    function showMilestone(total){
+      if(total > 0 && total % 5 === 0){
+        const big = (total % 10 === 0);
+        milestoneGif.src = big ? "assets/img/SC-Beers.gif" : "assets/img/SC-swim.gif";
+        milestoneText.textContent = big ? "HELL YEAH!" : "CHEERS!";
+        milestoneOverlay.classList.remove("hidden");
+        setTimeout(() => milestoneOverlay.classList.add("hidden"), 2000);
+      }
     }
 
     // ----------------------------
-    // Log events (tap = finished beer)
+    // Log beer (tap or end of drain)
     // ----------------------------
-    let events = loadEvents();
-    events.sort((a,b) => a-b);
-
-    function rebuildUI(){
-      countEl.textContent = String(events.length);
-      beerPile.innerHTML = "";
-      const pileCount = Math.min(30, events.length);
-      for(let i=0;i<pileCount;i++) addPileItem(false);
-    }
-
     function logBeer(){
-      ensureStarted();
-
       const prevTotal = events.length;
 
       events.push(Date.now());
@@ -827,7 +857,7 @@
       countEl.textContent = String(events.length);
       addPileItem(true);
 
-      // badge toast if newly unlocked
+      // toast if newly unlocked badge
       const newlyUnlocked = BADGES.find(b => prevTotal < b.req && events.length >= b.req);
       if(newlyUnlocked){
         showToast(`Unlocked: ${newlyUnlocked.name}`);
@@ -837,86 +867,79 @@
         vibrate(18);
       }
 
-      playRotatingSound();
-      checkMilestone(events.length);
-    }
-
-    function checkMilestone(total){
-      if(total > 0 && total % 5 === 0){
-        const ov = document.getElementById("milestoneOverlay");
-        const gif = document.getElementById("milestoneGif");
-        const txt = document.getElementById("milestoneText");
-
-        const big = (total % 10 === 0);
-        gif.src = big ? "assets/img/SC-Beers.gif" : "assets/img/SC-swim.gif";
-        txt.textContent = big ? "HELL YEAH!" : "CHEERS!";
-
-        ov.classList.remove("hidden");
-        setTimeout(() => ov.classList.add("hidden"), 2000);
+      // hide hint forever after first real log
+      if(localStorage.getItem(KEY_HINT_SEEN) !== "1"){
+        localStorage.setItem(KEY_HINT_SEEN, "1");
+        hintEl.classList.add("hidden");
       }
+
+      playRotatingSound();
+      showMilestone(events.length);
     }
 
     // ----------------------------
-    // Tap vs Long-Press (drain animation)
+    // Tap vs Hold (drain animation)
     // ----------------------------
-    let pressTimer = null;
-    let longPressTriggered = false;
+    function resetBeer(){
+      beerLiquid.style.height = "100%";
+      beerMask.style.opacity = "0";
+    }
+
+    let holdTimer = null;
+    let draining = false;
     const LONG_PRESS_MS = 450;
+    const DRAIN_MS = 900;
 
-    function startPress(e){
-      ensureStarted();
-      longPressTriggered = false;
+    function startHold(){
+      draining = false;
 
-      // show fill quickly so it looks like a “full beer” before draining
-      beerFill.classList.add("active");
-      beerFill.classList.remove("drain");
+      // show full beer overlay immediately
+      beerLiquid.style.height = "100%";
+      beerMask.style.opacity = "1";
 
-      pressTimer = setTimeout(() => {
-        longPressTriggered = true;
+      holdTimer = setTimeout(() => {
+        draining = true;
+        beerLiquid.style.height = "0%";
 
-        // drain animation
-        beerFill.classList.add("drain");
-
-        // log at end of drain (represents finishing the beer)
         setTimeout(() => {
-          beerFill.classList.remove("active");
-          beerFill.classList.remove("drain");
-          logBeer();
-        }, 950);
+          resetBeer();
+          logBeer(); // log when empty
+        }, DRAIN_MS);
 
       }, LONG_PRESS_MS);
     }
 
-    function endPress(){
-      if(pressTimer){
-        clearTimeout(pressTimer);
-        pressTimer = null;
+    function endHold(){
+      if(holdTimer){
+        clearTimeout(holdTimer);
+        holdTimer = null;
       }
 
-      if(!longPressTriggered){
-        // short tap = finish beer immediately (no drain)
-        beerFill.classList.remove("active");
-        beerFill.classList.remove("drain");
+      // If not draining, it's a tap: log immediately
+      if(!draining){
+        resetBeer();
         logBeer();
       }
-      // if long press triggered, log happens at end of drain
     }
 
-    mugBtn.addEventListener("pointerdown", (e) => { e.preventDefault(); startPress(e); }, { passive:false });
-    mugBtn.addEventListener("pointerup", (e) => { e.preventDefault(); endPress(); }, { passive:false });
-    mugBtn.addEventListener("pointercancel", endPress);
-    mugBtn.addEventListener("pointerleave", () => {
-      // if finger slides off, treat like release
-      if(pressTimer || longPressTriggered) endPress();
-    });
+    mugBtn.addEventListener("pointerdown", (e) => { e.preventDefault(); startHold(); }, { passive:false });
+    mugBtn.addEventListener("pointerup", (e) => { e.preventDefault(); endHold(); }, { passive:false });
+    mugBtn.addEventListener("pointercancel", () => { resetBeer(); draining = false; });
+    mugBtn.addEventListener("pointerleave", () => { if(holdTimer || draining) endHold(); });
 
     // ----------------------------
-    // Intro overlay (reliable mobile)
+    // Intro overlay (mobile-safe)
     // ----------------------------
-    startupOverlay.addEventListener("pointerdown", (e) => {
+    startupOverlay.addEventListener("pointerdown", async (e) => {
       e.preventDefault();
-      playIntro();
+      await playIntro();
     }, { passive:false });
+
+    // If user already started in past, hide overlay immediately
+    if(localStorage.getItem(KEY_STARTED) === "1"){
+      introHasPlayed = true; // don't try to replay intro automatically
+      startupOverlay.classList.add("hidden");
+    }
 
     // ----------------------------
     // Modals
@@ -943,23 +966,24 @@
     });
 
     statsBtn.addEventListener("click", () => {
-      renderStats(events);
+      renderStats();
       openModal(statsModal);
     });
 
     badgesBtn.addEventListener("click", () => {
-      renderBadges(events);
+      renderBadges();
       openModal(badgesModal);
     });
 
     // ----------------------------
-    // Reset (clears history + stats)
+    // Reset
     // ----------------------------
     document.getElementById("resetBtn").addEventListener("click", () => {
       if(confirm("Clear ALL history (timestamps + stats)?")){
         events = [];
         saveEvents(events);
         rebuildUI();
+        resetBeer();
         showToast("Reset");
         vibrate(30);
       }
@@ -969,6 +993,7 @@
     // Init
     // ----------------------------
     rebuildUI();
+    resetBeer();
   </script>
 </body>
-  </html>
+</html>
