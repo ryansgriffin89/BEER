@@ -44,170 +44,92 @@
     }
 
     .wrap {
-      width: min(980px, 100%);
+      width: min(600px, 100%);
       margin: 0 auto;
-      padding: 16px 14px 28px;
       height: 100vh;
       display: flex;
       flex-direction: column;
-      transition: filter 0.5s;
+      position: relative;
     }
 
-    /* --- Header --- */
-    header {
-      flex-shrink: 0;
+    /* --- Header (Stats & Badges) --- */
+    .header-bar {
       display: flex;
-      align-items: flex-end;
       justify-content: space-between;
-      gap: 12px;
-      padding: 14px 14px 12px;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      background: var(--glass);
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(10px);
-      z-index: 10;
-    }
-
-    .title h1 {
-      margin: 0;
-      font-size: 18px;
-      letter-spacing: 1.3px;
-      text-transform: uppercase;
-      color: var(--gold);
-      text-shadow: 0 0 18px rgba(247,201,72,.4);
-    }
-    .title p {
-      margin: 6px 0 0;
-      font-size: 13px;
-      color: var(--muted);
-      line-height: 1.2;
-    }
-
-    .headerBtns {
-      display: flex;
-      gap: 8px;
       align-items: center;
-      margin-left: auto;
+      padding: 16px 20px;
+      z-index: 10;
     }
 
     .btn {
       border: 1px solid rgba(255,255,255,.14);
-      background: rgba(0,0,0,.24);
-      color: rgba(255,255,255,.92);
-      border-radius: 14px;
-      padding: 8px 10px;
-      font-size: 12px;
-      letter-spacing: .8px;
+      background: rgba(0,0,0,.3);
+      color: rgba(255,255,255,.9);
+      border-radius: 20px;
+      padding: 8px 16px;
+      font-size: 13px;
+      letter-spacing: 1px;
       text-transform: uppercase;
       cursor: pointer;
       backdrop-filter: blur(6px);
-      box-shadow: 0 12px 30px rgba(0,0,0,.35);
+      box-shadow: 0 4px 12px rgba(0,0,0,.2);
       transition: transform 0.1s;
     }
-    .btn:active { transform: scale(.98); }
+    .btn:active { transform: scale(.95); }
 
-    .countBox { text-align: right; min-width: 120px; }
-    
+    /* --- Main Counter --- */
+    .counter-display {
+      text-align: center;
+      margin-top: 10px;
+      z-index: 5;
+    }
+    .counter-display h1 {
+      margin: 0;
+      font-size: 16px;
+      color: var(--gold);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      opacity: 0.8;
+      text-shadow: 0 0 10px rgba(247,201,72,0.3);
+    }
     #count {
-      font-size: 46px;
+      font-size: 72px;
       font-weight: 900;
       line-height: 1;
-      background: linear-gradient(180deg, rgba(255,255,255,.96), rgba(247,201,72,.92));
+      margin: 0;
+      background: linear-gradient(180deg, #fff, #ddd);
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
-      text-shadow: 0 10px 40px rgba(0,0,0,.45), 0 0 20px rgba(247,201,72,0.3);
-    }
-    .countLabel {
-      margin-top: 4px;
-      color: var(--muted);
-      font-size: 12px;
-      letter-spacing: 1px;
-      text-transform: uppercase;
+      filter: drop-shadow(0 4px 10px rgba(0,0,0,0.5));
     }
 
-    /* --- Stage --- */
+    /* --- The Stage (Mug Area) --- */
     .stage {
-      position: relative;
       flex-grow: 1;
-      margin-top: 16px;
-      border-radius: var(--radius);
-      border: 1px solid var(--border);
-      background: rgba(0,0,0,.22);
-      box-shadow: var(--shadow);
-      overflow: hidden;
-    }
-    .stage::after {
-      content: "";
-      position: absolute;
-      left: 0; right: 0; bottom: 0;
-      height: 32%;
-      background: linear-gradient(180deg, transparent, rgba(0,0,0,.72));
-      pointer-events: none;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
     }
 
-    /* Reset Btn */
-    .resetBtn {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background: rgba(255,0,0,0.16);
-      border: 1px solid rgba(255,0,0,0.35);
-      color: rgba(255,255,255,.90);
-      font-size: 10px;
-      padding: 6px 10px;
-      border-radius: 12px;
-      cursor: pointer;
-      z-index: 30;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      backdrop-filter: blur(6px);
-    }
-
-    /* Toast */
-    .toast {
-      position: absolute;
-      left: 50%;
-      top: 14px;
-      transform: translateX(-50%);
-      padding: 10px 12px;
-      border-radius: 14px;
-      border: 1px solid rgba(247,201,72,.18);
-      background: rgba(0,0,0,.85);
-      color: rgba(255,255,255,.92);
-      font-size: 12px;
-      letter-spacing: .8px;
-      text-transform: uppercase;
-      z-index: 40;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.25s, transform 0.25s;
-      box-shadow: 0 18px 40px rgba(0,0,0,.45);
-    }
-    .toast.show {
-      opacity: 1;
-      transform: translateX(-50%) translateY(6px);
-    }
-
-    /* --- Mug & Liquid --- */
+    /* Mug Button */
     #mugBtn {
-      position: absolute;
-      left: 16px;
-      top: 28px;
-      width: 180px;
-      height: 180px;
+      position: relative;
+      width: 220px;
+      height: 220px;
       border: none;
       padding: 0;
       background: transparent;
       cursor: pointer;
       z-index: 7;
-      transition: transform 0.08s;
-      border-radius: 26px;
+      border-radius: 30px;
       -webkit-user-select: none;
       user-select: none;
+      transition: transform 0.1s;
     }
-    #mugBtn:active { transform: scale(0.97); }
+    #mugBtn:active { transform: scale(0.96); }
 
     .mugWrap {
       position: relative;
@@ -215,20 +137,19 @@
       height: 100%;
     }
 
-    /* The Mask allows liquid to be shaped inside the mug */
+    /* Mask for Liquid */
     #beerMask {
       position: absolute;
-      /* Adjust these % based on your specific mug PNG transparency */
-      left: 24%;
-      right: 18%;
-      bottom: 15%; 
-      height: 52%;
-      border-radius: 4px;
+      /* Adjusted to fit generic mug shapes better */
+      left: 20%; 
+      right: 15%;
+      bottom: 12%; 
+      height: 60%;
+      border-radius: 0 0 10px 10px;
       overflow: hidden;
       z-index: 2;
-      opacity: 0;
-      transition: opacity 0.15s ease;
-      filter: drop-shadow(0 0 8px rgba(247, 201, 72, 0.4));
+      opacity: 0; /* Hidden by default */
+      transition: opacity 0.15s;
     }
 
     #beerLiquid {
@@ -237,26 +158,18 @@
       width: 100%;
       height: 100%; /* Animates to 0% */
       background: linear-gradient(180deg, rgba(255,220,140,0.96), rgba(255,170,60,0.96));
-      box-shadow: inset 0 0 12px rgba(255,255,255,0.20);
+      box-shadow: inset 0 0 20px rgba(255,140,0,0.5);
       transition: height 0.9s ease-in;
     }
-
-    /* BUBBLES ANIMATION */
+    /* Bubbles */
     #beerLiquid::after {
       content: "";
-      position: absolute;
-      inset: 0;
-      background-image: 
-        radial-gradient(rgba(255,255,255,0.5) 1px, transparent 1px),
-        radial-gradient(rgba(255,255,255,0.3) 1px, transparent 1px);
-      background-size: 10px 10px, 20px 20px;
-      background-position: 0 0, 10px 10px;
+      position: absolute; inset: 0;
+      background-image: radial-gradient(rgba(255,255,255,0.5) 1px, transparent 1px);
+      background-size: 15px 15px;
       animation: bubbles 2s linear infinite;
     }
-    @keyframes bubbles {
-      from { background-position: 0 0, 10px 10px; }
-      to { background-position: 0 -20px, 10px -10px; }
-    }
+    @keyframes bubbles { from { background-position: 0 0; } to { background-position: 0 -20px; } }
 
     .mugImg {
       position: relative;
@@ -264,83 +177,86 @@
       width: 100%;
       height: 100%;
       object-fit: contain;
-      filter: drop-shadow(0 18px 18px rgba(0,0,0,0.55));
+      filter: drop-shadow(0 20px 30px rgba(0,0,0,0.6));
       pointer-events: none;
     }
 
-    /* Hint */
+    /* Trash Can (Reset) */
+    .trash-container {
+      position: absolute;
+      bottom: 120px; /* Above pile */
+      right: 20px;
+      width: 70px;
+      height: 80px;
+      opacity: 0.7;
+      transition: all 0.2s;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+    }
+    .trash-container img {
+      width: 100%; height: 100%; object-fit: contain;
+      filter: drop-shadow(0 5px 10px rgba(0,0,0,0.5));
+    }
+    .trash-label {
+      font-size: 10px; color: #aaa; text-transform: uppercase; letter-spacing: 1px;
+      margin-top: 4px;
+    }
+    .trash-container:active { transform: scale(0.9); opacity: 1; }
+
+    /* Hint Text */
     #hint {
       position: absolute;
-      left: 16px;
-      top: 214px;
+      bottom: 140px;
+      left: 50%;
+      transform: translateX(-50%);
       font-size: 12px;
-      color: rgba(255,255,255,.72);
-      letter-spacing: .8px;
+      color: rgba(255,255,255,0.6);
       text-transform: uppercase;
-      z-index: 8;
-      user-select: none;
-      background: rgba(0,0,0,.35);
-      border: 1px solid rgba(255,255,255,.10);
-      padding: 8px 10px;
-      border-radius: 14px;
-      backdrop-filter: blur(8px);
-      box-shadow: 0 14px 30px rgba(0,0,0,.40);
+      letter-spacing: 1px;
+      pointer-events: none;
+      text-align: center;
+      width: 100%;
     }
     #hint.hidden { display: none; }
-
-    /* Bottle Decoration */
-    #bottleDeco {
-      position: absolute;
-      left: 214px;
-      top: 100px;
-      width: 56px;
-      height: 150px;
-      opacity: .92;
-      z-index: 4;
-      pointer-events: none;
-    }
-    #bottleDeco img {
-      width: 100%; height: 100%;
-      object-fit: contain;
-      filter: drop-shadow(0 12px 12px rgba(0,0,0,0.55));
-    }
 
     /* Beer Pile */
     #beerPile {
       position: absolute;
-      left: 12px;
-      bottom: 12px;
-      width: calc(100% - 24px);
-      height: 120px;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 100px;
+      padding: 10px;
       display: flex;
+      justify-content: center;
       flex-wrap: wrap-reverse;
-      align-content: flex-start;
-      gap: 4px;
-      z-index: 2;
+      gap: -5px; /* Slight overlap */
+      z-index: 4;
       pointer-events: none;
+      background: linear-gradient(0deg, rgba(0,0,0,0.8), transparent);
     }
     .pileItem {
-      width: 30px;
-      height: auto;
-      filter: drop-shadow(0 4px 4px rgba(0,0,0,0.65));
-      animation: popIn 0.28s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      width: 35px;
+      height: 35px;
+      object-fit: contain;
+      filter: drop-shadow(0 4px 5px rgba(0,0,0,0.7));
+      animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
-    @keyframes popIn{ from{ transform: scale(0); } to{ transform: scale(1); } }
+    @keyframes popIn{ from{ transform: scale(0) translateY(20px); } to{ transform: scale(1) translateY(0); } }
 
-    /* --- Animations (Shake & Sway) --- */
-    .shake {
-      animation: shakeAnim 0.3s cubic-bezier(.36,.07,.19,.97) both;
-    }
+    /* --- Animations --- */
+    .shake { animation: shakeAnim 0.3s cubic-bezier(.36,.07,.19,.97) both; }
     @keyframes shakeAnim {
       10%, 90% { transform: translate3d(-1px, 0, 0); }
       20%, 80% { transform: translate3d(2px, 0, 0); }
       30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
       40%, 60% { transform: translate3d(4px, 0, 0); }
     }
-
     .tipsy { animation: sway 5s ease-in-out infinite; }
     .wasted { animation: sway 3s ease-in-out infinite; filter: blur(0.4px); }
-    
     @keyframes sway {
       0% { transform: rotate(0deg); }
       25% { transform: rotate(1deg); }
@@ -351,148 +267,62 @@
     /* --- Overlays & Modals --- */
     .overlay.hidden { display: none; }
     .overlay {
-      position: fixed;
-      inset: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      background: rgba(0,0,0,1);
-      z-index: 10000;
-      padding: 16px;
-      transition: opacity 0.5s;
+      position: fixed; inset: 0;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      background: #000; z-index: 10000; transition: opacity 0.5s;
     }
     .overlayGif {
-      width: min(520px, 92vw);
-      border-radius: 18px;
-      box-shadow: 0 20px 60px rgba(0,0,0,.7);
+      width: min(500px, 90vw);
+      border-radius: 12px;
       border: 1px solid rgba(255,255,255,0.2);
     }
     .overlayText {
-      margin-top: 20px;
-      font-size: 24px;
-      font-weight: 900;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: var(--gold);
-      text-shadow: 0 0 20px rgba(247,201,72,0.35);
-      text-align: center;
+      margin-top: 20px; font-size: 24px; font-weight: 900; color: var(--gold);
+      text-transform: uppercase; letter-spacing: 2px;
+      text-shadow: 0 0 20px rgba(247,201,72,0.5);
     }
     .tapToStart {
-      margin-top: 18px;
-      font-size: 13px;
-      color: rgba(255,255,255,.74);
-      letter-spacing: 1px;
-      text-transform: uppercase;
+      margin-top: 20px; font-size: 12px; color: #888; letter-spacing: 1px;
       animation: blink 2s infinite;
     }
-    @keyframes blink { 50% { opacity: 0.55; }}
+    @keyframes blink { 50% { opacity: 0.5; }}
 
-    /* Modal Backdrop */
+    /* Modals */
     .modalBackdrop {
-      position: fixed; inset: 0;
-      background: rgba(0,0,0,.78);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 14px;
-      z-index: 11000;
+      position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+      display: none; align-items: center; justify-content: center; z-index: 11000;
     }
     .modalBackdrop.show { display: flex; }
-
-    /* Modal Content */
     .modal {
-      width: min(560px, 96vw);
-      max-height: 86vh;
-      overflow: auto;
-      border-radius: 22px;
-      border: 1px solid rgba(247,201,72,.20);
-      background: linear-gradient(180deg, rgba(15,15,20,0.95), rgba(10,10,10,0.95));
-      box-shadow: 0 30px 80px rgba(0,0,0,.65);
-      backdrop-filter: blur(10px);
+      width: min(500px, 90vw); max-height: 80vh; overflow-y: auto;
+      background: #111; border: 1px solid #333; border-radius: 16px;
+      box-shadow: 0 20px 50px #000;
     }
     .modalHeader {
-      padding: 14px 14px 10px;
-      border-bottom: 1px solid rgba(255,255,255,.10);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
+      padding: 16px; border-bottom: 1px solid #222;
+      display: flex; justify-content: space-between; align-items: center;
     }
-    .modalHeader h2 {
-      margin: 0;
-      font-size: 14px;
-      letter-spacing: 1.4px;
-      text-transform: uppercase;
-      color: var(--gold);
-      text-shadow: 0 0 14px rgba(247,201,72,.25);
-    }
+    .modalHeader h2 { margin: 0; color: var(--gold); font-size: 14px; text-transform: uppercase; letter-spacing: 1px; }
     .closeBtn {
-      border: 1px solid rgba(255,255,255,.14);
-      background: rgba(0,0,0,.25);
-      color: rgba(255,255,255,.92);
-      border-radius: 14px;
-      padding: 8px 10px;
-      cursor: pointer;
-      text-transform: uppercase;
-      letter-spacing: .8px;
-      font-size: 12px;
+      background: #222; border: none; color: #fff; padding: 6px 12px; border-radius: 8px; font-size: 11px; cursor: pointer;
     }
-    .modalBody { padding: 14px; color: rgba(255,255,255,.92); }
-    
-    .statLine {
-      padding: 10px 0;
-      border-bottom: 1px solid rgba(255,255,255,.08);
-      font-size: 13px;
-      letter-spacing: .3px;
-    }
-    .statLine:last-child { border-bottom: none; }
+    .modalBody { padding: 16px; color: #ddd; font-size: 13px; }
+    .statLine { padding: 8px 0; border-bottom: 1px solid #222; display: flex; justify-content: space-between; }
+    .badgeGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+    .badge { background: #1a1a1a; padding: 12px; border-radius: 12px; border: 1px solid #333; }
+    .badge.locked { opacity: 0.4; filter: grayscale(1); }
+    .badgeName { color: var(--gold); font-weight: bold; font-size: 12px; text-transform: uppercase; }
+    .badgeDesc { font-size: 11px; color: #888; margin-top: 4px; }
 
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 10px;
-      margin-top: 10px;
+    /* Toast */
+    .toast {
+      position: absolute; top: 80px; left: 50%; transform: translateX(-50%);
+      background: rgba(0,0,0,0.9); color: var(--gold); padding: 10px 20px;
+      border-radius: 20px; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;
+      pointer-events: none; opacity: 0; transition: 0.3s; z-index: 100; border: 1px solid rgba(247,201,72,0.3);
     }
-    .badge {
-      border-radius: 18px;
-      border: 1px solid rgba(247,201,72,.18);
-      background: rgba(255,255,255,.05);
-      padding: 12px;
-      box-shadow: 0 10px 20px rgba(0,0,0,.35);
-      position: relative;
-      overflow: hidden;
-    }
-    .badge.locked { opacity: .55; filter: grayscale(1); border-color: rgba(255,255,255,0.1); }
-    
-    .badgeName {
-      font-weight: 900;
-      letter-spacing: 1.1px;
-      text-transform: uppercase;
-      font-size: 12px;
-      color: var(--gold);
-    }
-    .badgeReq {
-      margin-top: 6px;
-      font-size: 11px;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      color: rgba(255,255,255,.72);
-    }
-    .badgeDesc {
-      margin-top: 8px;
-      font-size: 12px;
-      color: rgba(255,255,255,.72);
-      line-height: 1.25;
-    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(10px); }
 
-    @media (max-width: 600px){
-      #mugBtn { width: 155px; height: 155px; top: 24px; left: 10px; }
-      #bottleDeco { width: 46px; height: 132px; left: 175px; top: 92px; }
-      .title h1 { font-size: 16px; }
-      .grid { grid-template-columns: 1fr; }
-      #hint { top: 195px; left: 10px; font-size: 11px; }
-    }
   </style>
 </head>
 <body>
@@ -501,496 +331,279 @@
 
   <div id="startupOverlay" class="overlay">
     <img src="assets/img/SC-Smile.gif" alt="Stone Cold" class="overlayGif">
-    <div class="overlayText">WELCOME TO RYAN'S BAR</div>
-    <div class="tapToStart">TAP TO OPEN THE BAR (SOUND ON)</div>
+    <div class="overlayText"> Time to drink BAER bo!</div>
+    <div class="tapToStart">TAP ANYWHERE TO START</div>
   </div>
 
-  <div id="milestoneOverlay" class="overlay hidden" style="background: rgba(0,0,0,0.88);">
+  <div id="milestoneOverlay" class="overlay hidden" style="background: rgba(0,0,0,0.9);">
     <img id="milestoneGif" src="" alt="Milestone" class="overlayGif">
     <div class="overlayText" id="milestoneText">HELL YEAH!</div>
   </div>
 
-  <div id="statsModal" class="modalBackdrop" aria-hidden="true">
-    <div class="modal" role="dialog" aria-modal="true" aria-label="Stats">
-      <div class="modalHeader">
-        <h2>Stats</h2>
-        <button class="closeBtn" data-close="statsModal">Close</button>
-      </div>
+  <div id="statsModal" class="modalBackdrop">
+    <div class="modal">
+      <div class="modalHeader"><h2>Stats</h2><button class="closeBtn" data-close="statsModal">CLOSE</button></div>
       <div class="modalBody" id="statsBody"></div>
     </div>
   </div>
-
-  <div id="badgesModal" class="modalBackdrop" aria-hidden="true">
-    <div class="modal" role="dialog" aria-modal="true" aria-label="Badges">
-      <div class="modalHeader">
-        <h2>Badges</h2>
-        <button class="closeBtn" data-close="badgesModal">Close</button>
-      </div>
-      <div class="modalBody">
-        <div style="font-size:12px; color: rgba(255,255,255,.75); letter-spacing:.8px; text-transform:uppercase;">
-          Unlocked: <span id="badgesUnlocked">0</span> / <span id="badgesTotal">0</span>
-        </div>
-        <div id="badgesGrid" class="grid"></div>
-      </div>
+  <div id="badgesModal" class="modalBackdrop">
+    <div class="modal">
+      <div class="modalHeader"><h2>Badges</h2><button class="closeBtn" data-close="badgesModal">CLOSE</button></div>
+      <div class="modalBody" id="badgesGrid" class="badgeGrid"></div>
     </div>
   </div>
 
   <div class="wrap" id="mainWrap">
-    <header>
-      <div class="title">
-        <h1>Drunk Ryan's Counter</h1>
-        <p>Hold mug to drain • Tap to log</p>
-      </div>
-      <div class="headerBtns">
-        <button class="btn" id="statsBtn">Stats</button>
-        <button class="btn" id="badgesBtn">Badges</button>
-      </div>
-      <div class="countBox">
-        <div id="count">0</div>
-        <div class="countLabel">beers</div>
-      </div>
-    </header>
+    
+    <div class="header-bar">
+      <button class="btn" id="statsBtn">Stats</button>
+      <button class="btn" id="badgesBtn">Badges</button>
+    </div>
 
-    <main class="stage" id="stage">
+    <div class="counter-display">
+      <h1>BEERS DRUNK</h1>
+      <div id="count">0</div>
+    </div>
+
+    <div class="stage">
       <div id="toast" class="toast">Saved</div>
-      <button class="resetBtn" id="resetBtn">Reset</button>
-
-      <button id="mugBtn" aria-label="Log finished beer">
+      
+      <button id="mugBtn">
         <div class="mugWrap">
-          <div id="beerMask" aria-hidden="true">
-            <div id="beerLiquid"></div>
-          </div>
+          <div id="beerMask"><div id="beerLiquid"></div></div>
           <img class="mugImg" src="assets/img/Mug.png" alt="Mug">
         </div>
       </button>
 
-      <div id="hint">Hold the mug to drain it</div>
+      <div id="hint">Hold mug to drain • Tap to log</div>
       
-      <div id="bottleDeco" aria-hidden="true">
-        <img src="assets/img/MT.jpeg" alt="Bottle"> 
-        </div>
+      <div class="trash-container" id="trashBtn">
+        <img src="assets/img/Trash-can.png" alt="Trash">
+        <span class="trash-label">Reset</span>
+      </div>
+    </div>
 
-      <div id="beerPile"></div>
-    </main>
+    <div id="beerPile"></div>
+
   </div>
 
 <script>
-  // --- Constants & Keys ---
-  const KEY_EVENTS = "drunkRyanEventsV3";
-  const KEY_HINT_SEEN = "drunkRyanHintSeenV3";
-  const KEY_SOUND_INDEX = "drunkRyanSoundIndexV3";
-  const KEY_STARTED = "drunkRyanStartedV3";
+  // --- Constants ---
+  const KEY_EVENTS = "drunkRyanEventsV4";
+  const KEY_HINT = "drunkRyanHintV4";
+  const KEY_SOUND = "drunkRyanSoundV4";
 
-  // --- Elements ---
-  const countEl = document.getElementById("count");
-  const beerPile = document.getElementById("beerPile");
-  const mugBtn = document.getElementById("mugBtn");
-  const startupOverlay = document.getElementById("startupOverlay");
-  const milestoneOverlay = document.getElementById("milestoneOverlay");
-  const milestoneGif = document.getElementById("milestoneGif");
-  const milestoneText = document.getElementById("milestoneText");
-  const beerMask = document.getElementById("beerMask");
-  const beerLiquid = document.getElementById("beerLiquid");
-  const toastEl = document.getElementById("toast");
-  const hintEl = document.getElementById("hint");
-  const statsBtn = document.getElementById("statsBtn");
-  const badgesBtn = document.getElementById("badgesBtn");
-  const statsModal = document.getElementById("statsModal");
-  const badgesModal = document.getElementById("badgesModal");
-  const statsBody = document.getElementById("statsBody");
-  const badgesGrid = document.getElementById("badgesGrid");
-  const badgesUnlockedEl = document.getElementById("badgesUnlocked");
-  const badgesTotalEl = document.getElementById("badgesTotal");
-  const mainWrap = document.getElementById("mainWrap");
-
-  // --- Audio ---
+  // --- Audio Playlist (MATCHED TO YOUR REPO SCREENSHOT) ---
   const INTRO_SRC = "assets/audio/stone-cold-drink-beer.mp3";
-  const ROTATION = [
+  const PLAYLIST = [
     "assets/audio/beer-bottle-clinks.mp3",
     "assets/audio/Bell.mp3",
-    "assets/audio/SCSA Theme.mp3",
+    "assets/audio/SCSA-Theme.mp3",  // Fixed hyphen
     "assets/audio/Unbelievable.mp3",
     "assets/audio/What.mp3",
-    "assets/audio/kill-tony-song.mp3",
+    "assets/audio/John-cena.mp3",   // Added
+    "assets/audio/kill-tony-meow.mp3", // Added
+    "assets/audio/kill-tony-song.mp3", // Added
     "assets/audio/miller-time.mp3"
   ];
-  const CLINKS_MAX_SECONDS = 1.3;
   
-  let introHasPlayed = false;
+  let soundIndex = parseInt(localStorage.getItem(KEY_SOUND) || "0");
   let audioCtx = null;
-  let activeAudio = null; // Track current sound to stop it if needed
 
-  let soundIndex = (() => {
-    const saved = parseInt(localStorage.getItem(KEY_SOUND_INDEX) || "0", 10);
-    return Number.isFinite(saved) ? (saved % ROTATION.length) : 0;
-  })();
+  // --- Elements ---
+  const els = {
+    count: document.getElementById("count"),
+    pile: document.getElementById("beerPile"),
+    mug: document.getElementById("mugBtn"),
+    liquid: document.getElementById("beerLiquid"),
+    mask: document.getElementById("beerMask"),
+    toast: document.getElementById("toast"),
+    hint: document.getElementById("hint"),
+    trash: document.getElementById("trashBtn"),
+    wrap: document.getElementById("mainWrap"),
+    intro: document.getElementById("startupOverlay"),
+    milestone: document.getElementById("milestoneOverlay"),
+    milestoneGif: document.getElementById("milestoneGif"),
+    statsBody: document.getElementById("statsBody"),
+    badgesGrid: document.getElementById("badgesGrid")
+  };
 
-  async function unlockAudio() {
-    try {
-      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      if (audioCtx.state !== "running") await audioCtx.resume();
-    } catch(e) {}
-  }
+  // --- State ---
+  let events = [];
+  try { events = JSON.parse(localStorage.getItem(KEY_EVENTS) || "[]"); } catch(e){}
 
-  function stopActiveAudio() {
-    if (activeAudio) {
-      activeAudio.pause();
-      activeAudio.currentTime = 0;
-      activeAudio = null;
-    }
-  }
+  // --- Init ---
+  updateUI();
+  
+  if(localStorage.getItem(KEY_HINT) === "1") els.hint.classList.add("hidden");
 
-  async function playIntro() {
-    if (introHasPlayed) return;
-    introHasPlayed = true;
-    
-    await unlockAudio();
-    
-    const intro = new Audio(INTRO_SRC);
-    intro.volume = 1.0;
-    intro.play().catch(e => console.log("Intro blocked"));
-    
-    // Hide overlay
-    startupOverlay.style.opacity = "0";
-    setTimeout(() => startupOverlay.classList.add("hidden"), 500);
-    localStorage.setItem(KEY_STARTED, "1");
-  }
-
-  function playRotatingSound() {
-    stopActiveAudio();
-    const src = ROTATION[soundIndex];
-    const a = new Audio(src);
-    a.volume = 0.85;
-
-    // Special handling for clinks (trim it)
-    if (src.includes("beer-bottle-clinks")) {
-      setTimeout(() => {
-        if(a === activeAudio) {
-            a.pause();
-        }
-      }, CLINKS_MAX_SECONDS * 1000);
-    }
-
-    activeAudio = a;
-    a.play().catch(() => {});
-    
-    soundIndex = (soundIndex + 1) % ROTATION.length;
-    localStorage.setItem(KEY_SOUND_INDEX, String(soundIndex));
-  }
-
-  // --- Storage ---
-  function loadEvents() {
-    try {
-      const raw = localStorage.getItem(KEY_EVENTS);
-      const arr = raw ? JSON.parse(raw) : [];
-      return Array.isArray(arr) ? arr.filter(n => Number.isFinite(n)) : [];
-    } catch(e) { return []; }
-  }
-
-  function saveEvents(events) {
+  // --- Functions ---
+  function save() {
     localStorage.setItem(KEY_EVENTS, JSON.stringify(events));
-  }
-  
-  let events = loadEvents();
-  events.sort((a,b) => a - b);
-
-  // --- UI Helpers ---
-  function vibrate(ms) {
-    if (navigator.vibrate) navigator.vibrate(ms);
+    updateUI();
   }
 
-  function showToast(text) {
-    toastEl.textContent = text;
-    toastEl.classList.add("show");
-    setTimeout(() => toastEl.classList.remove("show"), 1200);
-  }
-
-  function addPileItem(animate) {
-    if (beerPile.children.length > 30) return;
-    const img = document.createElement("img");
-    img.src = "assets/img/Mug.png";
-    img.className = "pileItem";
-    if (!animate) img.style.animation = "none";
-    beerPile.appendChild(img);
-  }
-
-  function applyDrunkEffect(total) {
-    // Reset classes
-    document.body.classList.remove('tipsy', 'wasted');
-    if (total >= 10) {
-      document.body.classList.add('wasted');
-    } else if (total >= 5) {
-      document.body.classList.add('tipsy');
-    }
-  }
-  
-  function triggerScreenShake() {
-      mainWrap.classList.remove('shake');
-      void mainWrap.offsetWidth; // force reflow
-      mainWrap.classList.add('shake');
-  }
-
-  function rebuildUI() {
-    countEl.textContent = String(events.length);
-    beerPile.innerHTML = "";
+  function updateUI() {
+    els.count.textContent = events.length;
     
     // Pile
-    const pileCount = Math.min(30, events.length);
-    for (let i = 0; i < pileCount; i++) addPileItem(false);
-    
+    els.pile.innerHTML = "";
+    const showCount = Math.min(events.length, 30);
+    for(let i=0; i<showCount; i++) {
+      const img = document.createElement("img");
+      img.src = "assets/img/Mug.png";
+      img.className = "pileItem";
+      els.pile.appendChild(img);
+    }
+
     // Drunk Effect
-    applyDrunkEffect(events.length);
-
-    // Hint
-    if (localStorage.getItem(KEY_HINT_SEEN) === "1") {
-      hintEl.classList.add("hidden");
-    }
+    document.body.className = "";
+    if(events.length >= 10) document.body.className = "wasted";
+    else if(events.length >= 5) document.body.className = "tipsy";
   }
 
-  // --- Stats Logic ---
-  function yyyyMmDd(t) {
-    const d = new Date(t);
-    const y = d.getFullYear();
-    const m = String(d.getMonth()+1).padStart(2,"0");
-    const da = String(d.getDate()).padStart(2,"0");
-    return `${y}-${m}-${da}`;
-  }
-  
-  function monthKey(t) {
-    const d = new Date(t);
-    const y = d.getFullYear();
-    const m = String(d.getMonth()+1).padStart(2,"0");
-    return `${y}-${m}`;
-  }
-
-  function computeStats(ev) {
-    const total = ev.length;
-    const now = Date.now();
-    const todayKey = yyyyMmDd(now);
-    const thisMonth = monthKey(now);
+  function playSound() {
+    if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     
-    let today = 0;
-    let mtd = 0;
-    const byDay = new Map();
-
-    for(const t of ev) {
-      const dKey = yyyyMmDd(t);
-      byDay.set(dKey, (byDay.get(dKey) || 0) + 1);
-      if (dKey === todayKey) today++;
-      if (monthKey(t) === thisMonth) mtd++;
-    }
-
-    let highestDay = null, highestCount = 0;
-    let lowestDay = null, lowestCount = Infinity;
-
-    for(const [day, c] of byDay.entries()) {
-      if(c > highestCount) { highestCount = c; highestDay = day; }
-      if(c < lowestCount) { lowestCount = c; lowestDay = day; }
-    }
-    if(lowestCount === Infinity) { lowestCount = 0; lowestDay = null; }
-
-    // Beers Per Hour (Last 4h)
-    const FOUR_HOURS_MS = 4 * 3600 * 1000;
-    const last4h = ev.filter(t => (now - t) <= FOUR_HOURS_MS).length;
-    const bphLast4 = last4h > 0 ? (last4h / 4) : 0; // Simple approximation
-
-    // BPH Overall
-    let bphOverall = 0;
-    if (total >= 2) {
-      const first = ev[0];
-      const last = ev[total - 1];
-      const hours = Math.max(0.01, (last - first) / 3600000);
-      bphOverall = total / hours;
-    }
-
-    return { total, today, mtd, bphLast4, bphOverall, highestDay, highestCount, lowestDay, lowestCount };
-  }
-
-  function renderStats() {
-    const s = computeStats(events);
-    const lines = [
-      `<div class="statLine"><b>Total logged:</b> ${s.total}</div>`,
-      `<div class="statLine"><b>Beers today:</b> ${s.today}</div>`,
-      `<div class="statLine"><b>Beers MTD:</b> ${s.mtd}</div>`,
-      `<div class="statLine"><b>Beers/hr (last 4h):</b> ${s.bphLast4.toFixed(1)}</div>`,
-      `<div class="statLine"><b>Beers/hr (overall):</b> ${s.bphOverall.toFixed(2)}</div>`,
-      `<div class="statLine"><b>Highest day:</b> ${s.highestDay ? `${s.highestDay} (${s.highestCount})` : "-"}</div>`,
-    ];
-    statsBody.innerHTML = lines.join("");
-  }
-
-  // --- Badges Logic ---
-  const BADGES = [
-    { id:"b1", req:1, name: "First Sip", desc:"You logged your first beer." },
-    { id:"b5", req:5, name: "First Round", desc:"5 logged beers." },
-    { id:"b10", req:10, name: "Buzzed", desc:"10 logged beers." },
-    { id:"b24", req:24, name: "Case King", desc:"24 beers. Absolute legend." },
-    { id:"b25", req:25, name: "Stone Cold", desc:"HELL YEAH status." },
-    { id:"b50", req:50, name: "Regular", desc:"50 logged beers." },
-    { id:"b100", req:100, name: "Bar Fixture", desc:"100 logged beers." }
-  ];
-
-  function unlockedSet(total) {
-    return new Set(BADGES.filter(b => total >= b.req).map(b => b.id));
-  }
-
-  function renderBadges() {
-    const total = events.length;
-    const unlocked = unlockedSet(total);
+    const src = PLAYLIST[soundIndex % PLAYLIST.length];
+    const audio = new Audio(src);
+    audio.volume = 0.9;
     
-    badgesUnlockedEl.textContent = String(unlocked.size);
-    badgesTotalEl.textContent = String(BADGES.length);
-    badgesGrid.innerHTML = "";
-
-    for (const b of BADGES) {
-      const locked = !unlocked.has(b.id);
-      const card = document.createElement("div");
-      card.className = "badge" + (locked ? " locked" : "");
-      card.innerHTML = `
-        <div class="badgeName">${locked ? "???" : b.name}</div>
-        <div class="badgeReq">${b.req} beers</div>
-        <div class="badgeDesc">${locked ? "Keep logging to unlock." : b.desc}</div>
-      `;
-      badgesGrid.appendChild(card);
+    // Trim clinks
+    if(src.includes("beer-bottle-clinks")) {
+        setTimeout(() => audio.pause(), 1400);
     }
+    
+    audio.play().catch(e => console.log("Audio block", e));
+    
+    soundIndex++;
+    localStorage.setItem(KEY_SOUND, soundIndex);
   }
 
-  // --- Milestone ---
-  function showMilestone(total) {
-    if (total > 0 && total % 5 === 0) {
-      const big = (total % 10 === 0);
-      milestoneGif.src = big ? "assets/img/SC-Beers.gif" : "assets/img/SC-swim.gif";
-      milestoneText.textContent = big ? "HELL YEAH!" : "CHEERS!";
-      milestoneOverlay.classList.remove("hidden");
-      setTimeout(() => milestoneOverlay.classList.add("hidden"), 2000);
-    }
-  }
-
-  // --- Main Action: Log Beer ---
   function logBeer() {
-    const prevTotal = events.length;
-    
-    // Update data
     events.push(Date.now());
-    events.sort((a,b) => a - b);
-    saveEvents(events);
+    save();
+    playSound();
     
-    // Update UI
-    countEl.textContent = String(events.length);
-    addPileItem(true);
-    applyDrunkEffect(events.length);
-    triggerScreenShake();
+    // Visuals
+    els.toast.classList.add("show");
+    setTimeout(() => els.toast.classList.remove("show"), 1500);
     
-    // Check Badges
-    const newlyUnlocked = BADGES.find(b => prevTotal < b.req && events.length >= b.req);
-    if (newlyUnlocked) {
-      showToast(`Unlocked: ${newlyUnlocked.name}`);
-      vibrate(100);
-    } else {
-      showToast("Logged");
-      vibrate(30);
-    }
+    // Shake
+    els.wrap.classList.remove("shake");
+    void els.wrap.offsetWidth;
+    els.wrap.classList.add("shake");
 
     // Hide hint
-    if (localStorage.getItem(KEY_HINT_SEEN) !== "1") {
-      localStorage.setItem(KEY_HINT_SEEN, "1");
-      hintEl.classList.add("hidden");
+    if(localStorage.getItem(KEY_HINT) !== "1") {
+        localStorage.setItem(KEY_HINT, "1");
+        els.hint.classList.add("hidden");
     }
 
-    playRotatingSound();
-    showMilestone(events.length);
+    // Milestone
+    if(events.length > 0 && events.length % 5 === 0) {
+        const isBig = events.length % 10 === 0;
+        els.milestoneGif.src = isBig ? "assets/img/SC-Beers.gif" : "assets/img/SC-swim.gif";
+        els.milestone.classList.remove("hidden");
+        setTimeout(() => els.milestone.classList.add("hidden"), 2200);
+    }
   }
 
-  // --- Interactions (Tap vs Hold) ---
-  function resetBeerVisual() {
-    beerLiquid.style.height = "100%";
-    beerMask.style.opacity = "0";
-  }
-
+  // --- Tap/Hold Logic ---
   let holdTimer = null;
-  let draining = false;
-  const LONG_PRESS_MS = 350;
-  const DRAIN_MS = 900; // time for liquid to go down
+  let isDraining = false;
 
   function startHold() {
-    draining = false;
-    // Show liquid immediately
-    beerLiquid.style.transition = 'none'; // reset transition
-    beerLiquid.style.height = "100%";
-    beerMask.style.opacity = "1";
-    
+    isDraining = false;
+    els.liquid.style.transition = "none";
+    els.liquid.style.height = "100%";
+    els.mask.style.opacity = "1";
+
     holdTimer = setTimeout(() => {
-      // Start draining
-      draining = true;
-      beerLiquid.style.transition = `height ${DRAIN_MS}ms ease-in`;
-      beerLiquid.style.height = "0%";
-      
-      // When drain finishes
-      setTimeout(() => {
-        resetBeerVisual();
-        logBeer(); 
-      }, DRAIN_MS);
-      
-    }, LONG_PRESS_MS);
+        isDraining = true;
+        els.liquid.style.transition = "height 0.9s ease-in";
+        els.liquid.style.height = "0%";
+        setTimeout(() => {
+            logBeer();
+            resetVisuals();
+        }, 900);
+    }, 300);
   }
 
   function endHold() {
-    if (holdTimer) {
-      clearTimeout(holdTimer);
-      holdTimer = null;
+    clearTimeout(holdTimer);
+    if(!isDraining) {
+        logBeer();
+        resetVisuals();
     }
-    // If we let go before draining started, it's a "Tap"
-    if (!draining) {
-      resetBeerVisual();
-      logBeer();
-    }
-    // If draining already started, let it finish or reset? 
-    // Usually best to let it finish if they held it long enough, 
-    // but here we just reset if they interrupt the flow.
-    // For simplicity, we just reset visual if interrupted.
   }
 
-  mugBtn.addEventListener("pointerdown", (e) => { e.preventDefault(); startHold(); });
-  mugBtn.addEventListener("pointerup", (e) => { e.preventDefault(); endHold(); });
-  mugBtn.addEventListener("pointercancel", () => { resetBeerVisual(); draining = false; });
-  mugBtn.addEventListener("pointerleave", () => { if(holdTimer || draining) endHold(); });
+  function resetVisuals() {
+    els.mask.style.opacity = "0";
+    els.liquid.style.height = "100%";
+  }
 
-  // --- Intro Listener ---
-  startupOverlay.addEventListener("click", playIntro);
-  startupOverlay.addEventListener("touchstart", playIntro, {passive:false});
+  els.mug.addEventListener("mousedown", startHold);
+  els.mug.addEventListener("touchstart", (e) => { e.preventDefault(); startHold(); });
+  els.mug.addEventListener("mouseup", endHold);
+  els.mug.addEventListener("touchend", (e) => { e.preventDefault(); endHold(); });
 
-  // --- Modals ---
-  function openModal(el) { el.classList.add("show"); el.setAttribute("aria-hidden","false"); }
-  function closeModal(el) { el.classList.remove("show"); el.setAttribute("aria-hidden","true"); }
-
-  [statsModal, badgesModal].forEach(bd => {
-    bd.addEventListener("click", (e) => { if(e.target === bd) closeModal(bd); });
+  // --- Reset ---
+  els.trash.addEventListener("click", () => {
+    if(confirm("Empty the tab? This deletes all stats.")) {
+        events = [];
+        save();
+    }
   });
 
-  document.querySelectorAll("[data-close]").forEach(btn => {
-    btn.addEventListener("click", () => {
-      closeModal(document.getElementById(btn.getAttribute("data-close")));
+  // --- Intro ---
+  els.intro.addEventListener("click", () => {
+    const a = new Audio(INTRO_SRC);
+    a.play().catch(()=>{});
+    els.intro.style.opacity = "0";
+    setTimeout(() => els.intro.classList.add("hidden"), 500);
+  });
+
+  // --- Stats/Badges Modals ---
+  const BADGES = [
+    {req:1, name:"First Sip", desc:"Logged 1 beer"},
+    {req:5, name:"Warm Up", desc:"Logged 5 beers"},
+    {req:10, name:"Buzzin", desc:"Logged 10 beers"},
+    {req:24, name:"Case King", desc:"Logged 24 beers"},
+    {req:50, name:"Legend", desc:"Logged 50 beers"}
+  ];
+
+  document.getElementById("statsBtn").addEventListener("click", () => {
+    document.getElementById("statsModal").classList.add("show");
+    // Simple Stats Render
+    let today = 0;
+    const nowStr = new Date().toDateString();
+    events.forEach(t => { if(new Date(t).toDateString() === nowStr) today++; });
+    els.statsBody.innerHTML = `
+        <div class="statLine"><span>Total</span> <span>${events.length}</span></div>
+        <div class="statLine"><span>Today</span> <span>${today}</span></div>
+    `;
+  });
+
+  document.getElementById("badgesBtn").addEventListener("click", () => {
+    document.getElementById("badgesModal").classList.add("show");
+    els.badgesGrid.innerHTML = "";
+    BADGES.forEach(b => {
+        const locked = events.length < b.req;
+        els.badgesGrid.innerHTML += `
+            <div class="badge ${locked ? 'locked' : ''}">
+                <div class="badgeName">${b.name}</div>
+                <div class="badgeDesc">${locked ? 'Locked' : b.desc}</div>
+            </div>
+        `;
     });
   });
 
-  statsBtn.addEventListener("click", () => { renderStats(); openModal(statsModal); });
-  badgesBtn.addEventListener("click", () => { renderBadges(); openModal(badgesModal); });
-
-  // --- Reset ---
-  document.getElementById("resetBtn").addEventListener("click", () => {
-    if(confirm("Clear ALL history (timestamps + stats)?")) {
-      events = [];
-      saveEvents(events);
-      rebuildUI();
-      resetBeerVisual();
-      showToast("Reset");
-      vibrate(50);
-    }
+  document.querySelectorAll(".closeBtn").forEach(btn => {
+    btn.addEventListener("click", () => {
+        document.querySelectorAll(".modalBackdrop").forEach(m => m.classList.remove("show"));
+    });
   });
-
-  // --- Init ---
-  rebuildUI();
-  resetBeerVisual();
 
 </script>
 </body>
