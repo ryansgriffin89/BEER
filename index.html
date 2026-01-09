@@ -9,11 +9,17 @@
     :root{
       --radius: 22px;
       --shadow: 0 18px 60px rgba(0,0,0,.55);
-      --glass: rgba(0,0,0,.35);
+      --glass: rgba(0,0,0,.42);
       --border: rgba(255,255,255,.12);
       --text: rgba(255,255,255,.95);
       --muted: rgba(255,255,255,.72);
+
+      /* Billy Bob’s-ish honky-tonk */
       --gold: #f7c948;
+      --rust: #b65b3a;
+      --whiskey: #5a3a1e;
+      --neonTeal: #38f5ff;
+      --warmWhite: rgba(255,245,230,.95);
     }
 
     *{ box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
@@ -32,13 +38,34 @@
       position: fixed;
       inset: 0;
       background:
-        linear-gradient(rgba(0,0,0,.55), rgba(0,0,0,.72)),
+        radial-gradient(1200px 700px at 20% 10%, rgba(247,201,72,.18), transparent 60%),
+        radial-gradient(900px 500px at 90% 20%, rgba(182,91,58,.16), transparent 60%),
+        linear-gradient(rgba(0,0,0,.58), rgba(0,0,0,.78)),
         url("assets/img/Background.png");
       background-size: cover;
       background-position: center;
-      filter: saturate(1.1) contrast(1.05);
-      transform: scale(1.02);
-      z-index: -2;
+      filter: saturate(1.08) contrast(1.05);
+      transform: scale(1.03);
+      z-index: -3;
+    }
+
+    /* subtle “smoke/dust” layer */
+    .fx{
+      position: fixed;
+      inset: 0;
+      pointer-events:none;
+      z-index:-2;
+      background:
+        radial-gradient(500px 250px at 30% 35%, rgba(255,255,255,.06), transparent 70%),
+        radial-gradient(650px 300px at 70% 60%, rgba(255,255,255,.05), transparent 70%);
+      opacity: .55;
+      mix-blend-mode: screen;
+      filter: blur(2px);
+      animation: drift 10s ease-in-out infinite alternate;
+    }
+    @keyframes drift{
+      from{ transform: translate3d(-10px,-6px,0) scale(1.02); }
+      to{ transform: translate3d(10px,6px,0) scale(1.03); }
     }
 
     .wrap{
@@ -60,43 +87,103 @@
       padding: 14px 14px 12px;
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      background: rgba(0,0,0,.35);
+      background:
+        linear-gradient(180deg, rgba(0,0,0,.55), rgba(0,0,0,.35));
       box-shadow: var(--shadow);
-      backdrop-filter: blur(6px);
+      backdrop-filter: blur(8px);
       z-index: 10;
+      position: relative;
+      overflow:hidden;
     }
 
+    /* faint woodgrain-ish overlay */
+    header::before{
+      content:"";
+      position:absolute; inset:0;
+      background:
+        repeating-linear-gradient(
+          90deg,
+          rgba(90,58,30,.14) 0px,
+          rgba(90,58,30,.14) 6px,
+          rgba(0,0,0,0) 14px
+        );
+      opacity:.35;
+      mix-blend-mode: overlay;
+      pointer-events:none;
+    }
+
+    .title{ position:relative; z-index:1; }
+
+    /* neon sign title */
     .title h1{
       margin:0;
       font-size: 18px;
       letter-spacing: 1.3px;
       text-transform: uppercase;
       color: var(--gold);
+      text-shadow:
+        0 0 10px rgba(247,201,72,.35),
+        0 0 22px rgba(247,201,72,.20),
+        0 10px 40px rgba(0,0,0,.45);
+      animation: neonFlicker 6.5s infinite;
     }
+    @keyframes neonFlicker{
+      0%, 100% { opacity: 1; filter: saturate(1); }
+      92% { opacity: 1; }
+      93% { opacity: .75; }
+      94% { opacity: 1; }
+      97% { opacity: .85; }
+      98% { opacity: 1; }
+    }
+
     .title p{
       margin: 6px 0 0;
       font-size: 13px;
-      color: var(--muted);
+      color: rgba(255,245,230,.72);
     }
 
-    .countBox{ text-align:right; min-width: 110px; }
+    .countBox{ text-align:right; min-width: 130px; position:relative; z-index:1; }
     #count{
       font-size: 46px;
       font-weight: 900;
       line-height: 1;
-      background: linear-gradient(180deg, rgba(255,255,255,.96), rgba(247,201,72,.9));
+      background: linear-gradient(180deg, rgba(255,255,255,.96), rgba(247,201,72,.92));
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
-      text-shadow: 0 10px 40px rgba(0,0,0,.4);
+      text-shadow: 0 10px 40px rgba(0,0,0,.45);
     }
     .countLabel{
       margin-top: 4px;
-      color: var(--muted);
+      color: rgba(255,245,230,.70);
       font-size: 12px;
       letter-spacing: 1px;
       text-transform: uppercase;
     }
+
+    .headerBtns{
+      display:flex;
+      gap: 8px;
+      align-items:center;
+      margin-left: auto;
+      margin-right: 10px;
+      position:relative;
+      z-index: 2;
+    }
+    .iconBtn{
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.28);
+      color: var(--warmWhite);
+      border-radius: 14px;
+      padding: 8px 10px;
+      font-size: 12px;
+      letter-spacing: .6px;
+      text-transform: uppercase;
+      cursor:pointer;
+      backdrop-filter: blur(6px);
+      box-shadow: 0 12px 30px rgba(0,0,0,.35);
+    }
+    .iconBtn:active{ transform: scale(.98); }
 
     /* Main Stage */
     .stage{
@@ -105,7 +192,10 @@
       margin-top: 16px;
       border-radius: var(--radius);
       border: 1px solid var(--border);
-      background: rgba(0,0,0,.22);
+      background:
+        radial-gradient(700px 300px at 15% 25%, rgba(247,201,72,.08), transparent 70%),
+        radial-gradient(700px 300px at 85% 55%, rgba(182,91,58,.09), transparent 70%),
+        rgba(0,0,0,.25);
       box-shadow: var(--shadow);
       overflow: hidden;
     }
@@ -115,12 +205,10 @@
       content:"";
       position:absolute;
       left:0; right:0; bottom:0;
-      height: 30%;
-      background: linear-gradient(180deg, transparent, rgba(0,0,0,.62));
+      height: 32%;
+      background: linear-gradient(180deg, transparent, rgba(0,0,0,.70));
       pointer-events:none;
     }
-
-    /* --- Interactive Elements --- */
 
     /* The Mug (Tap Only) */
     #mugBtn{
@@ -132,8 +220,11 @@
       cursor: pointer;
       transition: transform 0.1s;
       z-index: 5;
+      background: transparent;
+      border: none;
+      padding: 0;
     }
-    #mugBtn img{ width:100%; height:100%; object-fit:contain; filter: drop-shadow(0 15px 15px rgba(0,0,0,0.5)); }
+    #mugBtn img{ width:100%; height:100%; object-fit:contain; filter: drop-shadow(0 15px 15px rgba(0,0,0,0.55)); }
     #mugBtn:active{ transform: scale(0.95); }
 
     .tapLabel{
@@ -141,14 +232,15 @@
       bottom: -10px;
       left: 50%;
       transform: translateX(-50%);
-      background: rgba(0,0,0,0.6);
+      background: rgba(0,0,0,0.62);
       padding: 4px 8px;
       border-radius: 8px;
       font-size: 10px;
       font-weight: bold;
       letter-spacing: 1px;
-      color: white;
+      color: var(--warmWhite);
       pointer-events: none;
+      border: 1px solid rgba(247,201,72,.25);
     }
 
     /* The Bottle (Draggable) */
@@ -167,12 +259,12 @@
       width: 100%;
       height: 100%;
       object-fit: contain;
-      filter: drop-shadow(0 10px 10px rgba(0,0,0,0.5));
+      filter: drop-shadow(0 10px 10px rgba(0,0,0,0.55));
       pointer-events: none;
     }
     #bottleDrag.is-dragging{
       cursor: grabbing;
-      opacity: 0.8;
+      opacity: 0.85;
       transform: scale(1.1);
       transition: none;
       z-index: 999;
@@ -181,13 +273,14 @@
       position: absolute;
       top: -25px;
       left: 50%;
-      width: 100px;
+      width: 110px;
       text-align: center;
       transform: translateX(-50%);
       font-size: 10px;
-      color: var(--muted);
-      opacity: 0.6;
+      color: rgba(255,245,230,.65);
+      opacity: 0.75;
       pointer-events: none;
+      letter-spacing: .9px;
     }
 
     /* The Trash Can */
@@ -199,16 +292,17 @@
       height: 160px;
       z-index: 4;
       transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      filter: saturate(1.05);
     }
     #trashZone img{
       width: 100%;
       height: 100%;
       object-fit: contain;
-      filter: drop-shadow(0 20px 20px rgba(0,0,0,0.6));
+      filter: drop-shadow(0 20px 20px rgba(0,0,0,0.65));
     }
     #trashZone.hovered{
       transform: scale(1.15) rotate(-5deg);
-      filter: brightness(1.2);
+      filter: brightness(1.15);
     }
 
     /* Beer Pile */
@@ -217,7 +311,7 @@
       left: 14px;
       bottom: 14px;
       width: calc(100% - 180px);
-      height: 100px;
+      height: 110px;
       display: flex;
       flex-wrap: wrap-reverse;
       align-content: flex-start;
@@ -228,10 +322,35 @@
     .pileItem{
       width: 30px;
       height: auto;
-      filter: drop-shadow(0 4px 4px rgba(0,0,0,0.6));
+      filter: drop-shadow(0 4px 4px rgba(0,0,0,0.65));
       animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
     @keyframes popIn{ from{ transform: scale(0); } to{ transform: scale(1); } }
+
+    /* Toast */
+    .toast{
+      position:absolute;
+      left: 50%;
+      top: 14px;
+      transform: translateX(-50%);
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(247,201,72,.18);
+      background: rgba(0,0,0,.55);
+      color: var(--warmWhite);
+      font-size: 12px;
+      letter-spacing: .8px;
+      text-transform: uppercase;
+      z-index: 40;
+      opacity: 0;
+      pointer-events:none;
+      transition: opacity .25s, transform .25s;
+      box-shadow: 0 18px 40px rgba(0,0,0,.45);
+    }
+    .toast.show{
+      opacity: 1;
+      transform: translateX(-50%) translateY(6px);
+    }
 
     /* --- Overlays --- */
     .overlay.hidden{ display:none; }
@@ -242,7 +361,7 @@
       flex-direction:column;
       align-items:center;
       justify-content:center;
-      background: rgba(0,0,0,1); /* Solid black for intro */
+      background: rgba(0,0,0,1);
       z-index: 10000;
       padding: 16px;
       transition: opacity 0.5s;
@@ -260,43 +379,237 @@
       letter-spacing: 2px;
       text-transform: uppercase;
       color: var(--gold);
-      text-shadow: 0 0 20px rgba(247,201,72,0.4);
+      text-shadow: 0 0 20px rgba(247,201,72,0.35);
       text-align: center;
     }
     .tapToStart{
       margin-top: 20px;
       font-size: 14px;
-      color: #888;
+      color: #aaa;
       animation: blink 2s infinite;
+      letter-spacing: 1px;
+      text-transform: uppercase;
     }
-    @keyframes blink { 50%{ opacity: 0.5; }}
+    @keyframes blink { 50%{ opacity: 0.55; }}
 
     /* Reset button */
     .resetBtn{
       position: absolute;
       top: 10px;
       right: 10px;
-      background: rgba(255,0,0,0.2);
-      border: 1px solid rgba(255,0,0,0.4);
-      color: #ffcccc;
+      background: rgba(182,91,58,0.18);
+      border: 1px solid rgba(182,91,58,0.35);
+      color: rgba(255,245,230,.90);
       font-size: 10px;
-      padding: 4px 8px;
-      border-radius: 4px;
+      padding: 6px 10px;
+      border-radius: 12px;
       cursor: pointer;
       z-index: 30;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      backdrop-filter: blur(6px);
     }
+
+    /* Modal base */
+    .modalBackdrop{
+      position:fixed; inset:0;
+      background: rgba(0,0,0,.78);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding: 14px;
+      z-index: 11000;
+    }
+    .modalBackdrop.show{ display:flex; }
+
+    .modal{
+      width: min(520px, 96vw);
+      max-height: 86vh;
+      overflow:auto;
+      border-radius: 22px;
+      border: 1px solid rgba(247,201,72,.20);
+      background:
+        radial-gradient(800px 260px at 30% 0%, rgba(247,201,72,.10), transparent 60%),
+        linear-gradient(180deg, rgba(0,0,0,.82), rgba(0,0,0,.62));
+      box-shadow: 0 30px 80px rgba(0,0,0,.65);
+      backdrop-filter: blur(10px);
+      position: relative;
+    }
+    .modalHeader{
+      padding: 14px 14px 10px;
+      border-bottom: 1px solid rgba(255,255,255,.10);
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap: 10px;
+    }
+    .modalHeader h2{
+      margin:0;
+      font-size: 14px;
+      letter-spacing: 1.4px;
+      text-transform: uppercase;
+      color: var(--gold);
+      text-shadow: 0 0 14px rgba(247,201,72,.25);
+    }
+    .closeBtn{
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.25);
+      color: var(--warmWhite);
+      border-radius: 14px;
+      padding: 8px 10px;
+      cursor:pointer;
+      text-transform: uppercase;
+      letter-spacing: .8px;
+      font-size: 12px;
+    }
+    .modalBody{ padding: 14px; color: rgba(255,245,230,.92); }
+
+    .row{
+      display:flex;
+      justify-content:space-between;
+      gap: 12px;
+      align-items:center;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+    .row:last-child{ border-bottom: none; }
+    .row label{
+      font-size: 12px;
+      letter-spacing: .9px;
+      text-transform: uppercase;
+      color: rgba(255,245,230,.82);
+    }
+    .sub{
+      font-size: 12px;
+      color: rgba(255,245,230,.70);
+      margin-top: 4px;
+      line-height: 1.25;
+    }
+    input[type="range"]{ width: 170px; }
+
+    .toggle{
+      display:flex; align-items:center; gap: 8px;
+      font-size: 12px;
+      color: rgba(255,245,230,.86);
+    }
+    .toggle input{ transform: scale(1.1); }
+
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap: 6px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.28);
+      cursor:pointer;
+      color: rgba(255,245,230,.92);
+      font-size: 12px;
+      letter-spacing: .8px;
+      text-transform: uppercase;
+    }
+
+    /* Achievements grid */
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .badge{
+      border-radius: 18px;
+      border: 1px solid rgba(247,201,72,.18);
+      background:
+        radial-gradient(240px 120px at 30% 0%, rgba(247,201,72,.14), transparent 60%),
+        linear-gradient(180deg, rgba(0,0,0,.55), rgba(0,0,0,.35));
+      padding: 12px;
+      box-shadow: 0 18px 40px rgba(0,0,0,.35);
+      position: relative;
+      overflow:hidden;
+    }
+    .badge::before{
+      content:"";
+      position:absolute; inset:-40px;
+      background:
+        repeating-linear-gradient(
+          45deg,
+          rgba(90,58,30,.20) 0px,
+          rgba(90,58,30,.20) 6px,
+          rgba(0,0,0,0) 14px
+        );
+      opacity:.25;
+      transform: rotate(8deg);
+      pointer-events:none;
+    }
+    .badgeTop{ position:relative; z-index:1; display:flex; align-items:center; justify-content:space-between; gap:10px;}
+    .badgeName{
+      font-weight: 900;
+      letter-spacing: 1.1px;
+      text-transform: uppercase;
+      font-size: 12px;
+      color: rgba(255,245,230,.95);
+    }
+    .badgeReq{
+      font-size: 11px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: rgba(255,245,230,.75);
+    }
+    .badgeDesc{
+      position:relative; z-index:1;
+      margin-top: 8px;
+      font-size: 12px;
+      color: rgba(255,245,230,.72);
+      line-height: 1.25;
+    }
+    .badge.locked{
+      opacity: .55;
+      filter: grayscale(.35);
+    }
+    .badge .stamp{
+      position:absolute;
+      right: -22px;
+      bottom: -18px;
+      width: 90px; height: 90px;
+      border-radius: 50%;
+      border: 2px solid rgba(247,201,72,.25);
+      background: rgba(247,201,72,.10);
+      transform: rotate(-14deg);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight: 900;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: rgba(255,245,230,.70);
+      font-size: 10px;
+    }
+
+    /* Receipt */
+    .receiptWrap{
+      margin-top: 12px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.35);
+      padding: 10px;
+    }
+    canvas{ width:100%; height:auto; border-radius: 14px; }
 
     @media (max-width: 600px){
       #mugBtn{ width: 130px; height: 130px; top: 30px; left: 10px;}
       #bottleDrag{ width: 45px; height: 120px; left: 150px; top: 80px;}
       #trashZone{ width: 110px; height: 130px; bottom: 10px; right: 10px; }
       .title h1{ font-size: 16px; }
+      .headerBtns{ margin-right: 0; }
+      .grid{ grid-template-columns: 1fr; }
+      input[type="range"]{ width: 150px; }
     }
   </style>
 </head>
 
 <body>
   <div class="bg"></div>
+  <div class="fx"></div>
 
   <div id="startupOverlay" class="overlay">
     <img src="assets/img/SC-Smile.gif" alt="Stone Cold" class="overlayGif">
@@ -304,9 +617,119 @@
     <div class="tapToStart">TAP SCREEN TO START</div>
   </div>
 
-  <div id="milestoneOverlay" class="overlay hidden" style="background: rgba(0,0,0,0.85);">
+  <div id="milestoneOverlay" class="overlay hidden" style="background: rgba(0,0,0,0.88);">
     <img id="milestoneGif" src="" alt="Milestone" class="overlayGif">
     <div class="overlayText" id="milestoneText">HELL YEAH!</div>
+  </div>
+
+  <!-- Settings modal -->
+  <div id="settingsModal" class="modalBackdrop" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-label="Settings">
+      <div class="modalHeader">
+        <h2>Settings</h2>
+        <button class="closeBtn" data-close="settingsModal">Close</button>
+      </div>
+      <div class="modalBody">
+        <div class="row">
+          <div>
+            <label>Volume</label>
+            <div class="sub">Controls tap + milestone sound volume.</div>
+          </div>
+          <input id="volumeRange" type="range" min="0" max="100" value="80">
+        </div>
+
+        <div class="row">
+          <div>
+            <label>Haptics</label>
+            <div class="sub">Buzz on taps & milestones (if supported).</div>
+          </div>
+          <div class="toggle">
+            <input id="hapticsToggle" type="checkbox" checked>
+            <span>On</span>
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label>Milestone Overlays</label>
+            <div class="sub">Show GIF overlays every 5 beers.</div>
+          </div>
+          <div class="toggle">
+            <input id="milestoneToggle" type="checkbox" checked>
+            <span>On</span>
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label>Session Mode</label>
+            <div class="sub">Track a drinking session (time + beers/hour).</div>
+          </div>
+          <button id="sessionBtn" class="pill">Start Session</button>
+        </div>
+
+        <div class="row">
+          <div>
+            <label>Receipt</label>
+            <div class="sub">Generate a shareable “tab receipt”.</div>
+          </div>
+          <button id="receiptBtn" class="pill">Open Receipt</button>
+        </div>
+
+        <div class="row">
+          <div>
+            <label>Achievements</label>
+            <div class="sub">Your bar-wall badges (includes Case King at 24).</div>
+          </div>
+          <button id="achBtn" class="pill">Open Achievements</button>
+        </div>
+
+        <div style="margin-top:12px; font-size:12px; color: rgba(255,245,230,.68); line-height:1.25;">
+          Tip: Add this to your home screen for full “app” vibes.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Achievements modal -->
+  <div id="achModal" class="modalBackdrop" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-label="Achievements">
+      <div class="modalHeader">
+        <h2>Wall of Fame</h2>
+        <button class="closeBtn" data-close="achModal">Close</button>
+      </div>
+      <div class="modalBody">
+        <div style="font-size:12px; color: rgba(255,245,230,.75); letter-spacing:.8px; text-transform:uppercase;">
+          Unlocked: <span id="achUnlockedCount">0</span> / <span id="achTotalCount">0</span>
+        </div>
+        <div id="achGrid" class="grid"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Receipt modal -->
+  <div id="receiptModal" class="modalBackdrop" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-label="Receipt">
+      <div class="modalHeader">
+        <h2>Close Tab Receipt</h2>
+        <button class="closeBtn" data-close="receiptModal">Close</button>
+      </div>
+      <div class="modalBody">
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <button id="shareReceipt" class="pill">Share</button>
+          <button id="downloadReceipt" class="pill">Download</button>
+          <button id="regenReceipt" class="pill">Regenerate</button>
+        </div>
+
+        <div class="receiptWrap">
+          <canvas id="receiptCanvas" width="900" height="520"></canvas>
+        </div>
+
+        <div style="margin-top:10px; font-size:12px; color: rgba(255,245,230,.68); line-height:1.25;">
+          If Share doesn’t pop up on your phone, use Download.
+        </div>
+      </div>
+    </div>
   </div>
 
   <div class="wrap">
@@ -315,6 +738,12 @@
         <h1>Drunk Ryan’s Counter</h1>
         <p>Tap the mug or Drag the bottle.</p>
       </div>
+
+      <div class="headerBtns">
+        <button class="iconBtn" id="statsBtn">Stats</button>
+        <button class="iconBtn" id="settingsBtn">Settings</button>
+      </div>
+
       <div class="countBox">
         <div id="count">0</div>
         <div class="countLabel">beers</div>
@@ -322,19 +751,21 @@
     </header>
 
     <main class="stage" id="stage">
+      <div id="toast" class="toast">Unlocked!</div>
+
       <button class="resetBtn" id="resetBtn">RESET TAB</button>
 
-      <div id="mugBtn">
+      <button id="mugBtn" aria-label="Add a beer">
         <img src="assets/img/Mug.png" alt="Mug">
         <div class="tapLabel">TAP ME</div>
-      </div>
+      </button>
 
-      <div id="bottleDrag">
+      <div id="bottleDrag" aria-label="Drag bottle to trash">
         <div class="dragLabel">DRAG ME</div>
         <img src="assets/img/MT.jpeg" alt="Bottle">
       </div>
 
-      <div id="trashZone">
+      <div id="trashZone" aria-label="Trash zone">
         <img src="assets/img/Trash-can.png" alt="Trash">
       </div>
 
@@ -343,78 +774,100 @@
   </div>
 
   <script>
-    // --- Elements ---
+    const KEY_COUNT = 'drunkRyanCount';
+    const KEY_SETTINGS = 'drunkRyanSettings';
+    const KEY_SESSIONS = 'drunkRyanSessions';
+    const KEY_ACTIVE_SESSION = 'drunkRyanActiveSession';
+
     const countEl = document.getElementById("count");
     const mugBtn = document.getElementById("mugBtn");
     const bottleDrag = document.getElementById("bottleDrag");
     const trashZone = document.getElementById("trashZone");
     const beerPile = document.getElementById("beerPile");
-    const stage = document.getElementById("stage");
     const startupOverlay = document.getElementById("startupOverlay");
-    
-    // --- Audio Setup ---
+    const toastEl = document.getElementById("toast");
+
+    const settingsModal = document.getElementById("settingsModal");
+    const achModal = document.getElementById("achModal");
+    const receiptModal = document.getElementById("receiptModal");
+
+    const settingsBtn = document.getElementById("settingsBtn");
+    const statsBtn = document.getElementById("statsBtn");
+    const volumeRange = document.getElementById("volumeRange");
+    const hapticsToggle = document.getElementById("hapticsToggle");
+    const milestoneToggle = document.getElementById("milestoneToggle");
+    const sessionBtn = document.getElementById("sessionBtn");
+    const receiptBtn = document.getElementById("receiptBtn");
+    const achBtn = document.getElementById("achBtn");
+
+    const achGrid = document.getElementById("achGrid");
+    const achUnlockedCount = document.getElementById("achUnlockedCount");
+    const achTotalCount = document.getElementById("achTotalCount");
+
+    const receiptCanvas = document.getElementById("receiptCanvas");
+    const shareReceiptBtn = document.getElementById("shareReceipt");
+    const downloadReceiptBtn = document.getElementById("downloadReceipt");
+    const regenReceiptBtn = document.getElementById("regenReceipt");
+
     const introAudio = new Audio("assets/audio/stone-cold-drink-beer.mp3");
     introAudio.volume = 1.0;
-    
-    // Removed "Merica.mp3"
+
     const tapSounds = [
       "assets/audio/beer-bottle-clinks.mp3",
-      "assets/audio/Bell.mp3", 
+      "assets/audio/Bell.mp3",
       "assets/audio/SCSA Theme.mp3",
       "assets/audio/Unbelievable.mp3",
       "assets/audio/What.mp3"
     ];
     let soundIndex = 0;
+    let soundChannel = null;
 
-    // --- State ---
     let count = 0;
     let introHasPlayed = false;
 
-    // --- Initialization ---
-    function loadState() {
-      const saved = localStorage.getItem('drunkRyanCount');
-      if(saved) {
-        count = parseInt(saved, 10);
-        countEl.innerText = count;
-        // Rebuild visual pile
-        for(let i=0; i<count; i++) addPileItem(false); 
-      }
-    }
-    loadState();
+    let settings = { volume: 0.8, haptics: true, milestones: true };
 
-    // --- Intro Logic ---
-    // Browsers block auto-audio. We must wait for interaction.
-    function startExperience() {
-      if(introHasPlayed) return;
-      introHasPlayed = true;
-      
-      introAudio.play().catch(e => console.log("Audio block", e));
-      
-      // Keep overlay for 2.2s while audio plays
-      setTimeout(() => {
-        startupOverlay.style.opacity = '0';
-        setTimeout(() => startupOverlay.classList.add('hidden'), 500);
-      }, 2200);
+    const ACHIEVEMENTS = [
+      { id: "a5",  req: 5,   name: "First Round", desc: "You’ve officially started the tab." },
+      { id: "a10", req: 10,  name: "Buzzed", desc: "That honky-tonk glow is hittin’." },
+      { id: "a24", req: 24,  name: "Case King", desc: "24 deep. Absolute legend energy." },
+      { id: "a25", req: 25,  name: "Stone Cold Certified", desc: "HELL YEAH status achieved." },
+      { id: "a50", req: 50,  name: "Billy Bob’s Regular", desc: "They know your name at the bar." },
+      { id: "a100",req: 100, name: "Hall of Fame", desc: "The wall will remember you forever." }
+    ];
+
+    const clamp = (n,a,b)=>Math.max(a,Math.min(b,n));
+
+    function vibrate(ms){
+      if(!settings.haptics) return;
+      if(navigator.vibrate) navigator.vibrate(ms);
+    }
+    function showToast(text){
+      toastEl.textContent = text;
+      toastEl.classList.add('show');
+      setTimeout(() => toastEl.classList.remove('show'), 1200);
     }
 
-    // Listen for first interaction anywhere to start audio
-    startupOverlay.addEventListener('click', startExperience);
-    startupOverlay.addEventListener('touchstart', startExperience);
-
-
-    // --- Core Logic ---
-    function increment(source) {
-      count++;
-      countEl.innerText = count;
-      localStorage.setItem('drunkRyanCount', count);
-      
-      playRandomSound();
-      addPileItem(true);
-      checkMilestone();
+    function loadSettings(){
+      try{
+        const raw = localStorage.getItem(KEY_SETTINGS);
+        if(raw){
+          const s = JSON.parse(raw);
+          settings.volume = clamp((s.volume ?? settings.volume), 0, 1);
+          settings.haptics = (s.haptics ?? settings.haptics);
+          settings.milestones = (s.milestones ?? settings.milestones);
+        }
+      }catch(e){}
+      volumeRange.value = Math.round(settings.volume * 100);
+      hapticsToggle.checked = !!settings.haptics;
+      milestoneToggle.checked = !!settings.milestones;
+    }
+    function saveSettings(){
+      localStorage.setItem(KEY_SETTINGS, JSON.stringify(settings));
     }
 
-    function addPileItem(animate) {
-      if(beerPile.children.length > 30) return; 
+    function addPileItem(animate){
+      if(beerPile.children.length > 30) return;
       const img = document.createElement('img');
       img.src = 'assets/img/Mug.png';
       img.className = 'pileItem';
@@ -422,46 +875,389 @@
       beerPile.appendChild(img);
     }
 
-    function playRandomSound() {
-      const s = new Audio(tapSounds[soundIndex]);
-      s.volume = 0.8;
-      s.play().catch(()=>{});
+    function loadCount(){
+      const saved = localStorage.getItem(KEY_COUNT);
+      if(saved){
+        count = parseInt(saved, 10) || 0;
+        countEl.innerText = count;
+        for(let i=0; i<count; i++) addPileItem(false);
+      }
+    }
+    function saveCount(){
+      localStorage.setItem(KEY_COUNT, String(count));
+    }
+
+    function startExperience(){
+      if(introHasPlayed) return;
+      introHasPlayed = true;
+      introAudio.volume = Math.max(settings.volume, 0.7);
+      introAudio.play().catch(()=>{});
+      setTimeout(() => {
+        startupOverlay.style.opacity = '0';
+        setTimeout(() => startupOverlay.classList.add('hidden'), 500);
+      }, 2200);
+    }
+    startupOverlay.addEventListener('click', startExperience);
+    startupOverlay.addEventListener('touchstart', startExperience);
+
+    function playNextSound(){
+      try{
+        if(soundChannel){
+          soundChannel.pause();
+          soundChannel.currentTime = 0;
+        }
+      }catch(e){}
+      soundChannel = new Audio(tapSounds[soundIndex]);
+      soundChannel.volume = settings.volume;
+      soundChannel.play().catch(()=>{});
       soundIndex = (soundIndex + 1) % tapSounds.length;
     }
 
-    function checkMilestone() {
-      if(count > 0 && count % 5 === 0) {
+    function unlockedAchievements(){
+      return ACHIEVEMENTS.filter(a => count >= a.req).map(a => a.id);
+    }
+
+    function checkAchievementUnlocks(){
+      const prev = count - 1;
+      const newly = ACHIEVEMENTS.filter(a => prev < a.req && count >= a.req);
+      if(newly.length){
+        showToast(`Unlocked: ${newly[0].name}`);
+        vibrate(60);
+      }
+    }
+
+    function checkMilestone(){
+      if(!settings.milestones) return;
+      if(count > 0 && count % 5 === 0){
+        vibrate(45);
         const ov = document.getElementById('milestoneOverlay');
         const gif = document.getElementById('milestoneGif');
-        gif.src = (count % 10 === 0) ? "assets/img/SC-Beers.gif" : "assets/img/SC-swim.gif";
+        const txt = document.getElementById('milestoneText');
+        const isBig = (count % 10 === 0);
+        gif.src = isBig ? "assets/img/SC-Beers.gif" : "assets/img/SC-swim.gif";
+        txt.textContent = isBig ? "HELL YEAH!" : "CHEERS!";
         ov.classList.remove('hidden');
         setTimeout(() => ov.classList.add('hidden'), 2000);
       }
     }
 
-    // --- DRAG AND DROP LOGIC (Touch + Mouse) ---
+    function increment(){
+      count++;
+      countEl.innerText = count;
+      saveCount();
+      vibrate(18);
+      playNextSound();
+      addPileItem(true);
+      checkMilestone();
+      checkAchievementUnlocks();
+    }
+
+    function getSessions(){
+      try{
+        const raw = localStorage.getItem(KEY_SESSIONS);
+        return raw ? JSON.parse(raw) : [];
+      }catch(e){ return []; }
+    }
+    function saveSessions(arr){
+      localStorage.setItem(KEY_SESSIONS, JSON.stringify(arr));
+    }
+    function getActiveSession(){
+      try{
+        const raw = localStorage.getItem(KEY_ACTIVE_SESSION);
+        return raw ? JSON.parse(raw) : null;
+      }catch(e){ return null; }
+    }
+    function setActiveSession(obj){
+      if(!obj) localStorage.removeItem(KEY_ACTIVE_SESSION);
+      else localStorage.setItem(KEY_ACTIVE_SESSION, JSON.stringify(obj));
+    }
+
+    function formatDuration(ms){
+      const s = Math.max(0, Math.floor(ms / 1000));
+      const h = Math.floor(s / 3600);
+      const m = Math.floor((s % 3600) / 60);
+      if(h > 0) return `${h}h ${m}m`;
+      return `${m}m`;
+    }
+
+    function refreshSessionButton(){
+      const active = getActiveSession();
+      sessionBtn.textContent = active ? "End Session" : "Start Session";
+    }
+
+    function startSession(){
+      const active = getActiveSession();
+      if(active) return;
+      setActiveSession({ startTs: Date.now(), startCount: count });
+      refreshSessionButton();
+      showToast("Session started");
+      vibrate(30);
+    }
+
+    function endSession(){
+      const active = getActiveSession();
+      if(!active) return;
+
+      const endTs = Date.now();
+      const beers = Math.max(0, count - (active.startCount || 0));
+      const durationMs = Math.max(1, endTs - (active.startTs || endTs));
+      const bph = beers / (durationMs / 3600000);
+
+      const sessions = getSessions();
+      sessions.unshift({
+        startTs: active.startTs,
+        endTs,
+        beers,
+        durationMs,
+        bph: Math.round(bph * 10) / 10
+      });
+      saveSessions(sessions.slice(0,7));
+      setActiveSession(null);
+
+      refreshSessionButton();
+      showToast(`Session saved (${beers} beers)`);
+      vibrate(45);
+    }
+
+    function statsSummaryText(){
+      const sessions = getSessions();
+      const lifetime = count;
+      const totalSessions = sessions.length;
+      const avgPer = totalSessions ? (sessions.reduce((a,s)=>a+s.beers,0)/totalSessions) : 0;
+      const best = totalSessions ? sessions.reduce((best, s)=> (s.beers > best.beers ? s : best), sessions[0]) : null;
+
+      const lines = [];
+      lines.push(`Lifetime: ${lifetime} beers`);
+      lines.push(`Saved sessions (last 7): ${totalSessions}`);
+      if(totalSessions){
+        lines.push(`Avg/session: ${avgPer.toFixed(1)} beers`);
+        lines.push(`Best: ${best.beers} beers in ${formatDuration(best.durationMs)} (${best.bph} bph)`);
+      }
+      return lines.join("\\n");
+    }
+
+    function openStats(){
+      alert(statsSummaryText());
+    }
+
+    function renderAchievements(){
+      achGrid.innerHTML = '';
+      const unlockedIds = new Set(unlockedAchievements());
+      achTotalCount.textContent = String(ACHIEVEMENTS.length);
+      achUnlockedCount.textContent = String(unlockedIds.size);
+
+      ACHIEVEMENTS.forEach(a => {
+        const card = document.createElement('div');
+        const locked = !unlockedIds.has(a.id);
+        card.className = 'badge' + (locked ? ' locked' : '');
+        card.innerHTML = `
+          <div class="badgeTop">
+            <div class="badgeName">${locked ? "???" : a.name}</div>
+            <div class="badgeReq">${a.req} beers</div>
+          </div>
+          <div class="badgeDesc">${locked ? "Keep drinkin’ to unlock this badge." : a.desc}</div>
+          <div class="stamp">${locked ? "Locked" : "Unlocked"}</div>
+        `;
+        achGrid.appendChild(card);
+      });
+    }
+
+    function roundRect(ctx, x, y, w, h, r){
+      ctx.beginPath();
+      ctx.moveTo(x+r, y);
+      ctx.arcTo(x+w, y, x+w, y+h, r);
+      ctx.arcTo(x+w, y+h, x, y+h, r);
+      ctx.arcTo(x, y+h, x, y, r);
+      ctx.arcTo(x, y, x+w, y, r);
+      ctx.closePath();
+    }
+
+    function drawReceipt(){
+      const ctx = receiptCanvas.getContext('2d');
+      const w = receiptCanvas.width;
+      const h = receiptCanvas.height;
+      ctx.clearRect(0,0,w,h);
+
+      ctx.fillStyle = "#0b0b10";
+      ctx.fillRect(0,0,w,h);
+
+      const grd = ctx.createLinearGradient(0,0,w,h);
+      grd.addColorStop(0, "rgba(247,201,72,0.18)");
+      grd.addColorStop(0.45, "rgba(182,91,58,0.10)");
+      grd.addColorStop(1, "rgba(0,0,0,0.0)");
+      ctx.fillStyle = grd;
+      ctx.fillRect(0,0,w,h);
+
+      const pad = 48;
+      const cardX = pad, cardY = pad, cardW = w - pad*2, cardH = h - pad*2;
+      roundRect(ctx, cardX, cardY, cardW, cardH, 28);
+      ctx.fillStyle = "rgba(0,0,0,0.55)";
+      ctx.fill();
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = "rgba(247,201,72,0.35)";
+      ctx.stroke();
+
+      ctx.fillStyle = "#f7c948";
+      ctx.font = "900 44px system-ui, -apple-system, Segoe UI, Roboto";
+      ctx.fillText("RYAN'S BAR TAB", cardX + 34, cardY + 74);
+
+      ctx.fillStyle = "rgba(255,245,230,0.85)";
+      ctx.font = "700 22px system-ui, -apple-system, Segoe UI, Roboto";
+      const dt = new Date();
+      ctx.fillText(dt.toLocaleString(), cardX + 34, cardY + 110);
+
+      ctx.fillStyle = "rgba(255,245,230,0.92)";
+      ctx.font = "900 34px system-ui, -apple-system, Segoe UI, Roboto";
+      ctx.fillText(`Beers: ${count}`, cardX + 34, cardY + 170);
+
+      const active = getActiveSession();
+      ctx.font = "700 22px system-ui, -apple-system, Segoe UI, Roboto";
+      ctx.fillStyle = "rgba(255,245,230,0.80)";
+      ctx.fillText(active ? "Session: ACTIVE" : "Session: CLOSED", cardX + 34, cardY + 205);
+
+      const unlocked = unlockedAchievements().length;
+      ctx.fillText(`Badges Unlocked: ${unlocked}/${ACHIEVEMENTS.length}`, cardX + 34, cardY + 240);
+
+      const lines = [
+        "“That’s the bottom line.”",
+        "“Honky-tonk certified.”",
+        "“Tip your bartender.”",
+        "“Case King energy.”",
+        "“See y’all next round.”"
+      ];
+      const quote = lines[Math.floor(Math.random() * lines.length)];
+      ctx.fillStyle = "rgba(56,245,255,0.80)";
+      ctx.font = "800 26px system-ui, -apple-system, Segoe UI, Roboto";
+      ctx.fillText(quote, cardX + 34, cardY + 300);
+
+      ctx.fillStyle = "rgba(255,245,230,0.75)";
+      ctx.font = "700 22px system-ui, -apple-system, Segoe UI, Roboto";
+      const price = 6.50;
+      const subtotal = (count * price);
+      const tip = subtotal * 0.20;
+      const total = subtotal + tip;
+
+      const y0 = cardY + cardH - 140;
+      ctx.fillText(`Subtotal (${count} x $${price.toFixed(2)}):`, cardX + 34, y0);
+      ctx.fillText(`Tip (20%):`, cardX + 34, y0 + 38);
+      ctx.font = "900 28px system-ui, -apple-system, Segoe UI, Roboto";
+      ctx.fillStyle = "#f7c948";
+      ctx.fillText(`TOTAL: $${total.toFixed(2)}`, cardX + 34, y0 + 90);
+
+      ctx.fillStyle = "rgba(255,245,230,0.35)";
+      ctx.font = "700 16px system-ui, -apple-system, Segoe UI, Roboto";
+      ctx.fillText("Generated by Drunk Ryan’s Counter", cardX + 34, cardY + cardH - 30);
+    }
+
+    async function shareReceipt(){
+      const blob = await new Promise(res => receiptCanvas.toBlob(res, 'image/png'));
+      if(!blob) return;
+      const file = new File([blob], "ryans-bar-tab.png", { type: "image/png" });
+
+      if(navigator.canShare && navigator.canShare({ files: [file] })){
+        try{
+          await navigator.share({ title: "Ryan’s Bar Tab", text: "HELL YEAH 🍻", files: [file] });
+          showToast("Shared");
+        }catch(e){}
+      } else {
+        downloadReceipt();
+      }
+    }
+
+    function downloadReceipt(){
+      const a = document.createElement('a');
+      a.download = "ryans-bar-tab.png";
+      a.href = receiptCanvas.toDataURL('image/png');
+      a.click();
+      showToast("Downloaded");
+    }
+
+    function openModal(el){
+      el.classList.add('show');
+      el.setAttribute('aria-hidden','false');
+      vibrate(12);
+    }
+    function closeModal(el){
+      el.classList.remove('show');
+      el.setAttribute('aria-hidden','true');
+      vibrate(8);
+    }
+
+    [settingsModal, achModal, receiptModal].forEach(backdrop => {
+      backdrop.addEventListener('click', (e) => {
+        if(e.target === backdrop) closeModal(backdrop);
+      });
+    });
+
+    document.querySelectorAll('[data-close]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        closeModal(document.getElementById(btn.getAttribute('data-close')));
+      });
+    });
+
+    settingsBtn.addEventListener('click', () => {
+      refreshSessionButton();
+      openModal(settingsModal);
+    });
+    statsBtn.addEventListener('click', openStats);
+
+    receiptBtn.addEventListener('click', () => {
+      drawReceipt();
+      openModal(receiptModal);
+    });
+
+    achBtn.addEventListener('click', () => {
+      renderAchievements();
+      openModal(achModal);
+    });
+
+    volumeRange.addEventListener('input', () => {
+      settings.volume = clamp(volumeRange.value / 100, 0, 1);
+      saveSettings();
+    });
+    hapticsToggle.addEventListener('change', () => {
+      settings.haptics = !!hapticsToggle.checked;
+      saveSettings();
+      vibrate(20);
+    });
+    milestoneToggle.addEventListener('change', () => {
+      settings.milestones = !!milestoneToggle.checked;
+      saveSettings();
+      showToast(settings.milestones ? "Milestones on" : "Milestones off");
+    });
+
+    sessionBtn.addEventListener('click', () => {
+      const active = getActiveSession();
+      if(active) endSession(); else startSession();
+      refreshSessionButton();
+    });
+
+    shareReceiptBtn.addEventListener('click', shareReceipt);
+    downloadReceiptBtn.addEventListener('click', downloadReceipt);
+    regenReceiptBtn.addEventListener('click', () => { drawReceipt(); showToast("Regenerated"); });
+
+    // Drag & drop
     let isDragging = false;
     let startX, startY;
 
     const getClientCoords = (e) => {
       return e.touches ? { x: e.touches[0].clientX, y: e.touches[0].clientY } : { x: e.clientX, y: e.clientY };
-    }
+    };
 
     const startDrag = (e) => {
       if(e.type === 'mousedown') e.preventDefault();
       isDragging = true;
-      const coords = getClientCoords(e);
-      startX = coords.x;
-      startY = coords.y;
+      const c = getClientCoords(e);
+      startX = c.x;
+      startY = c.y;
       bottleDrag.classList.add('is-dragging');
     };
 
     const moveDrag = (e) => {
       if(!isDragging) return;
-      const coords = getClientCoords(e);
-      const dx = coords.x - startX;
-      const dy = coords.y - startY;
-
+      const c = getClientCoords(e);
+      const dx = c.x - startX;
+      const dy = c.y - startY;
       bottleDrag.style.transform = `translate(${dx}px, ${dy}px) scale(1.1)`;
 
       const bottleRect = bottleDrag.getBoundingClientRect();
@@ -472,25 +1268,20 @@
         bottleRect.right > trashRect.left &&
         bottleRect.top < trashRect.bottom &&
         bottleRect.bottom > trashRect.top
-      ) {
-        trashZone.classList.add('hovered');
-      } else {
-        trashZone.classList.remove('hovered');
-      }
+      ) trashZone.classList.add('hovered');
+      else trashZone.classList.remove('hovered');
     };
 
-    const endDrag = (e) => {
+    const endDrag = () => {
       if(!isDragging) return;
       isDragging = false;
       bottleDrag.classList.remove('is-dragging');
-      
-      if(trashZone.classList.contains('hovered')) {
-        increment('drag');
+
+      if(trashZone.classList.contains('hovered')){
+        increment();
         trashZone.classList.remove('hovered');
-        bottleDrag.style.transform = `translate(0px, 0px)`; 
-      } else {
-        bottleDrag.style.transform = `translate(0px, 0px)`; 
       }
+      bottleDrag.style.transform = `translate(0px, 0px)`;
     };
 
     bottleDrag.addEventListener('mousedown', startDrag);
@@ -500,19 +1291,23 @@
     window.addEventListener('mouseup', endDrag);
     window.addEventListener('touchend', endDrag);
 
-    // Tap Listener
-    mugBtn.addEventListener('click', () => increment('tap'));
+    mugBtn.addEventListener('click', increment);
 
-    // Reset Listener
     document.getElementById('resetBtn').addEventListener('click', () => {
       if(confirm("Empty the tab?")) {
         count = 0;
         countEl.innerText = 0;
         beerPile.innerHTML = '';
-        localStorage.setItem('drunkRyanCount', 0);
+        saveCount();
+        showToast("Tab cleared");
+        vibrate(30);
       }
     });
+
+    // init
+    loadSettings();
+    loadCount();
+    refreshSessionButton();
   </script>
 </body>
-</html>
-
+          </html>
