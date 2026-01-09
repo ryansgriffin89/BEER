@@ -23,7 +23,7 @@
       font-family: system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
       color: var(--text);
       background: #0b0d10;
-      overflow:hidden; /* Prevent scroll bounce on drag */
+      overflow:hidden;
       touch-action: none;
     }
 
@@ -154,13 +154,13 @@
     /* The Bottle (Draggable) */
     #bottleDrag{
       position: absolute;
-      left: 170px; /* Positioned next to mug */
+      left: 170px;
       top: 100px;
       width: 50px;
       height: 140px;
       cursor: grab;
       z-index: 6;
-      touch-action: none; /* Critical for dragging */
+      touch-action: none;
       transition: transform 0.2s;
     }
     #bottleDrag img{
@@ -168,13 +168,13 @@
       height: 100%;
       object-fit: contain;
       filter: drop-shadow(0 10px 10px rgba(0,0,0,0.5));
-      pointer-events: none; /* Let clicks pass through to container */
+      pointer-events: none;
     }
     #bottleDrag.is-dragging{
       cursor: grabbing;
       opacity: 0.8;
       transform: scale(1.1);
-      transition: none; /* No lag while dragging */
+      transition: none;
       z-index: 999;
     }
     .dragLabel{
@@ -190,7 +190,7 @@
       pointer-events: none;
     }
 
-    /* The Trash Can (Target) */
+    /* The Trash Can */
     #trashZone{
       position:absolute;
       right: 20px;
@@ -211,21 +211,12 @@
       filter: brightness(1.2);
     }
 
-    /* Animation Container */
-    #animLayer{
-      position:absolute;
-      inset:0;
-      pointer-events:none;
-      z-index: 20;
-      overflow: hidden;
-    }
-
-    /* Beer Pile (Bottom Left) */
+    /* Beer Pile */
     #beerPile{
       position:absolute;
       left: 14px;
       bottom: 14px;
-      width: calc(100% - 180px); /* Leave room for trash */
+      width: calc(100% - 180px);
       height: 100px;
       display: flex;
       flex-wrap: wrap-reverse;
@@ -242,44 +233,6 @@
     }
     @keyframes popIn{ from{ transform: scale(0); } to{ transform: scale(1); } }
 
-    /* --- The Advanced Parabola Animation --- */
-    /* Wrapper moves horizontally (Linear) */
-    .fly-wrapper {
-      position: absolute;
-      width: 40px;
-      height: 40px;
-      left: 0;
-      top: 0;
-      /* These vars are set by JS per throw */
-      --startX: 0px;
-      --startY: 0px;
-      --endX: 0px;
-      --endY: 0px;
-      
-      transform: translate(var(--startX), var(--startY));
-      animation: x-axis 0.8s linear forwards;
-    }
-
-    /* Inner moves vertically (Gravity/Ease-In) and rotates */
-    .fly-inner {
-      width: 100%;
-      height: 100%;
-      background-image: url('assets/img/MT.jpeg'); /* Or bottle image */
-      background-size: contain;
-      background-repeat: no-repeat;
-      animation: y-axis 0.8s cubic-bezier(0.55, 0.085, 0.68, 0.53) forwards, spin 0.8s linear infinite;
-    }
-
-    @keyframes x-axis {
-      to { transform: translate(var(--endX), var(--startY)); }
-    }
-    @keyframes y-axis {
-      to { transform: translate(0, calc(var(--endY) - var(--startY))); }
-    }
-    @keyframes spin {
-      to { transform: rotate(720deg); }
-    }
-
     /* --- Overlays --- */
     .overlay.hidden{ display:none; }
     .overlay{
@@ -289,10 +242,10 @@
       flex-direction:column;
       align-items:center;
       justify-content:center;
-      background: rgba(0,0,0,.85);
+      background: rgba(0,0,0,1); /* Solid black for intro */
       z-index: 10000;
       padding: 16px;
-      animation: fadeIn 0.3s;
+      transition: opacity 0.5s;
     }
     .overlayGif{
       width: min(520px, 92vw);
@@ -310,8 +263,15 @@
       text-shadow: 0 0 20px rgba(247,201,72,0.4);
       text-align: center;
     }
+    .tapToStart{
+      margin-top: 20px;
+      font-size: 14px;
+      color: #888;
+      animation: blink 2s infinite;
+    }
+    @keyframes blink { 50%{ opacity: 0.5; }}
 
-    /* Reset button (small, top right) */
+    /* Reset button */
     .resetBtn{
       position: absolute;
       top: 10px;
@@ -338,12 +298,13 @@
 <body>
   <div class="bg"></div>
 
-  <div id="startupOverlay" class="overlay hidden">
+  <div id="startupOverlay" class="overlay">
     <img src="assets/img/SC-Smile.gif" alt="Stone Cold" class="overlayGif">
     <div class="overlayText">WELCOME TO RYAN'S BAR</div>
+    <div class="tapToStart">TAP SCREEN TO START</div>
   </div>
 
-  <div id="milestoneOverlay" class="overlay hidden">
+  <div id="milestoneOverlay" class="overlay hidden" style="background: rgba(0,0,0,0.85);">
     <img id="milestoneGif" src="" alt="Milestone" class="overlayGif">
     <div class="overlayText" id="milestoneText">HELL YEAH!</div>
   </div>
@@ -377,7 +338,6 @@
         <img src="assets/img/Trash-can.png" alt="Trash">
       </div>
 
-      <div id="animLayer"></div>
       <div id="beerPile"></div>
     </main>
   </div>
@@ -388,18 +348,18 @@
     const mugBtn = document.getElementById("mugBtn");
     const bottleDrag = document.getElementById("bottleDrag");
     const trashZone = document.getElementById("trashZone");
-    const animLayer = document.getElementById("animLayer");
     const beerPile = document.getElementById("beerPile");
     const stage = document.getElementById("stage");
+    const startupOverlay = document.getElementById("startupOverlay");
     
     // --- Audio Setup ---
     const introAudio = new Audio("assets/audio/stone-cold-drink-beer.mp3");
-    introAudio.volume = 0.9;
+    introAudio.volume = 1.0;
     
+    // Removed "Merica.mp3"
     const tapSounds = [
       "assets/audio/beer-bottle-clinks.mp3",
       "assets/audio/Bell.mp3", 
-      "assets/audio/Merica.mp3",
       "assets/audio/SCSA Theme.mp3",
       "assets/audio/Unbelievable.mp3",
       "assets/audio/What.mp3"
@@ -408,7 +368,7 @@
 
     // --- State ---
     let count = 0;
-    let introPlayed = false;
+    let introHasPlayed = false;
 
     // --- Initialization ---
     function loadState() {
@@ -422,40 +382,44 @@
     }
     loadState();
 
+    // --- Intro Logic ---
+    // Browsers block auto-audio. We must wait for interaction.
+    function startExperience() {
+      if(introHasPlayed) return;
+      introHasPlayed = true;
+      
+      introAudio.play().catch(e => console.log("Audio block", e));
+      
+      // Keep overlay for 2.2s while audio plays
+      setTimeout(() => {
+        startupOverlay.style.opacity = '0';
+        setTimeout(() => startupOverlay.classList.add('hidden'), 500);
+      }, 2200);
+    }
+
+    // Listen for first interaction anywhere to start audio
+    startupOverlay.addEventListener('click', startExperience);
+    startupOverlay.addEventListener('touchstart', startExperience);
+
+
     // --- Core Logic ---
     function increment(source) {
-      if(!introPlayed) playIntro();
-      
       count++;
       countEl.innerText = count;
       localStorage.setItem('drunkRyanCount', count);
       
       playRandomSound();
-      
-      // If tapped, animate throw. If dragged, we already physically moved it.
-      if(source === 'tap') {
-        animateThrow();
-      }
-      
       addPileItem(true);
       checkMilestone();
     }
 
     function addPileItem(animate) {
-      if(beerPile.children.length > 30) return; // Cap visual pile so it doesn't crash browser
+      if(beerPile.children.length > 30) return; 
       const img = document.createElement('img');
       img.src = 'assets/img/Mug.png';
       img.className = 'pileItem';
       if(!animate) img.style.animation = 'none';
       beerPile.appendChild(img);
-    }
-
-    function playIntro() {
-      introPlayed = true;
-      const ov = document.getElementById('startupOverlay');
-      ov.classList.remove('hidden');
-      introAudio.play().catch(e => console.log("Audio blocked"));
-      setTimeout(() => ov.classList.add('hidden'), 2200);
     }
 
     function playRandomSound() {
@@ -475,63 +439,20 @@
       }
     }
 
-    // --- THE FANCY ANIMATION (Calculates arc based on positions) ---
-    function animateThrow() {
-      // 1. Get positions
-      const startRect = mugBtn.getBoundingClientRect();
-      const endRect = trashZone.getBoundingClientRect();
-      const stageRect = stage.getBoundingClientRect();
-
-      // 2. Calculate offsets relative to the stage
-      const startX = (startRect.left + startRect.width/2) - stageRect.left;
-      const startY = (startRect.top + startRect.height/2) - stageRect.top;
-      
-      const endX = (endRect.left + endRect.width/2) - stageRect.left;
-      // Aim for middle of trash can
-      const endY = (endRect.top + endRect.height/2) - stageRect.top; 
-
-      // 3. Create elements
-      const wrapper = document.createElement('div');
-      wrapper.className = 'fly-wrapper';
-      const inner = document.createElement('div');
-      inner.className = 'fly-inner';
-      
-      // 4. Set CSS Variables for this specific throw
-      wrapper.style.setProperty('--startX', `${startX}px`);
-      wrapper.style.setProperty('--startY', `${startY}px`);
-      wrapper.style.setProperty('--endX', `${endX}px`);
-      wrapper.style.setProperty('--endY', `${endY}px`);
-
-      wrapper.appendChild(inner);
-      animLayer.appendChild(wrapper);
-
-      // 5. Clean up after animation
-      setTimeout(() => { wrapper.remove(); }, 800);
-    }
-
     // --- DRAG AND DROP LOGIC (Touch + Mouse) ---
     let isDragging = false;
-    let startX, startY, initialLeft, initialTop;
+    let startX, startY;
 
-    // Helper to get coordinates
     const getClientCoords = (e) => {
       return e.touches ? { x: e.touches[0].clientX, y: e.touches[0].clientY } : { x: e.clientX, y: e.clientY };
     }
 
     const startDrag = (e) => {
-      if(e.type === 'mousedown') e.preventDefault(); // prevent image drag ghosting
+      if(e.type === 'mousedown') e.preventDefault();
       isDragging = true;
       const coords = getClientCoords(e);
       startX = coords.x;
       startY = coords.y;
-      
-      const rect = bottleDrag.getBoundingClientRect();
-      const parentRect = stage.getBoundingClientRect();
-      
-      // Save initial relative position
-      initialLeft = rect.left - parentRect.left;
-      initialTop = rect.top - parentRect.top;
-
       bottleDrag.classList.add('is-dragging');
     };
 
@@ -541,10 +462,8 @@
       const dx = coords.x - startX;
       const dy = coords.y - startY;
 
-      // Move element
       bottleDrag.style.transform = `translate(${dx}px, ${dy}px) scale(1.1)`;
 
-      // Collision Detection with Trash
       const bottleRect = bottleDrag.getBoundingClientRect();
       const trashRect = trashZone.getBoundingClientRect();
 
@@ -565,30 +484,23 @@
       isDragging = false;
       bottleDrag.classList.remove('is-dragging');
       
-      // Check collision one last time
       if(trashZone.classList.contains('hovered')) {
-        // Success!
         increment('drag');
         trashZone.classList.remove('hovered');
-        // Reset position instantly
         bottleDrag.style.transform = `translate(0px, 0px)`; 
       } else {
-        // Snap back
         bottleDrag.style.transform = `translate(0px, 0px)`; 
       }
     };
 
-    // Listeners
     bottleDrag.addEventListener('mousedown', startDrag);
     bottleDrag.addEventListener('touchstart', startDrag, {passive: false});
-
     window.addEventListener('mousemove', moveDrag);
     window.addEventListener('touchmove', moveDrag, {passive: false});
-
     window.addEventListener('mouseup', endDrag);
     window.addEventListener('touchend', endDrag);
 
-    // Click Listener for Mug
+    // Tap Listener
     mugBtn.addEventListener('click', () => increment('tap'));
 
     // Reset Listener
@@ -600,7 +512,6 @@
         localStorage.setItem('drunkRyanCount', 0);
       }
     });
-
   </script>
 </body>
 </html>
