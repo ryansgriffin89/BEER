@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-  <title>Billy Bob’s Beer Tracker</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Drunk Ryan's Counter</title>
 
   <style>
     :root{
@@ -16,17 +16,18 @@
       --gold: #f7c948;
     }
 
-    *{ box-sizing:border-box; }
+    *{ box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
     html,body{ height:100%; }
     body{
       margin:0;
       font-family: system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
       color: var(--text);
       background: #0b0d10;
-      overflow-x:hidden;
+      overflow:hidden; /* Prevent scroll bounce on drag */
+      touch-action: none;
     }
 
-    /* Background image (Billy Bob’s vibe) */
+    /* Background image */
     .bg{
       position: fixed;
       inset: 0;
@@ -39,22 +40,19 @@
       transform: scale(1.02);
       z-index: -2;
     }
-    /* subtle vignette */
-    .bg::after{
-      content:"";
-      position:absolute;
-      inset:0;
-      background: radial-gradient(circle at center, transparent 35%, rgba(0,0,0,.65) 85%);
-      pointer-events:none;
-    }
 
     .wrap{
       width: min(980px, 100%);
       margin: 0 auto;
       padding: 16px 14px 28px;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
     }
 
+    /* Header */
     header{
+      flex-shrink: 0;
       display:flex;
       align-items:flex-end;
       justify-content:space-between;
@@ -65,6 +63,7 @@
       background: rgba(0,0,0,.35);
       box-shadow: var(--shadow);
       backdrop-filter: blur(6px);
+      z-index: 10;
     }
 
     .title h1{
@@ -72,6 +71,7 @@
       font-size: 18px;
       letter-spacing: 1.3px;
       text-transform: uppercase;
+      color: var(--gold);
     }
     .title p{
       margin: 6px 0 0;
@@ -98,121 +98,189 @@
       text-transform: uppercase;
     }
 
+    /* Main Stage */
     .stage{
       position: relative;
+      flex-grow: 1;
       margin-top: 16px;
-      height: 620px;
       border-radius: var(--radius);
       border: 1px solid var(--border);
       background: rgba(0,0,0,.22);
       box-shadow: var(--shadow);
-      overflow:hidden;
+      overflow: hidden;
     }
 
-    /* bar-floor fade */
+    /* Floor Fade */
     .stage::after{
       content:"";
       position:absolute;
       left:0; right:0; bottom:0;
-      height: 44%;
+      height: 30%;
       background: linear-gradient(180deg, transparent, rgba(0,0,0,.62));
       pointer-events:none;
     }
 
-    /* Mug button */
+    /* --- Interactive Elements --- */
+
+    /* The Mug (Tap Only) */
     #mugBtn{
       position:absolute;
-      left: 16px;
-      top: 16px;
-      width: 175px;
-      height: 175px;
-      background: transparent;
-      border: none;
-      padding: 0;
+      left: 20px;
+      top: 40px;
+      width: 160px;
+      height: 160px;
       cursor: pointer;
-      user-select: none;
-      -webkit-tap-highlight-color: transparent;
-      transform-origin: 50% 70%;
+      transition: transform 0.1s;
+      z-index: 5;
     }
-    #mugBtn img{
+    #mugBtn img{ width:100%; height:100%; object-fit:contain; filter: drop-shadow(0 15px 15px rgba(0,0,0,0.5)); }
+    #mugBtn:active{ transform: scale(0.95); }
+
+    .tapLabel{
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.6);
+      padding: 4px 8px;
+      border-radius: 8px;
+      font-size: 10px;
+      font-weight: bold;
+      letter-spacing: 1px;
+      color: white;
+      pointer-events: none;
+    }
+
+    /* The Bottle (Draggable) */
+    #bottleDrag{
+      position: absolute;
+      left: 170px; /* Positioned next to mug */
+      top: 100px;
+      width: 50px;
+      height: 140px;
+      cursor: grab;
+      z-index: 6;
+      touch-action: none; /* Critical for dragging */
+      transition: transform 0.2s;
+    }
+    #bottleDrag img{
       width: 100%;
       height: 100%;
       object-fit: contain;
-      filter: drop-shadow(0 20px 18px rgba(0,0,0,.6));
+      filter: drop-shadow(0 10px 10px rgba(0,0,0,0.5));
+      pointer-events: none; /* Let clicks pass through to container */
     }
-    #mugBtn:active{ transform: scale(.98) translateY(2px); }
-
-    .tapHint{
-      position:absolute;
-      left:50%;
-      bottom: 10px;
+    #bottleDrag.is-dragging{
+      cursor: grabbing;
+      opacity: 0.8;
+      transform: scale(1.1);
+      transition: none; /* No lag while dragging */
+      z-index: 999;
+    }
+    .dragLabel{
+      position: absolute;
+      top: -25px;
+      left: 50%;
+      width: 100px;
+      text-align: center;
       transform: translateX(-50%);
-      font-size:12px;
-      font-weight: 900;
-      letter-spacing: 2px;
-      color: rgba(255,255,255,.92);
-      background: rgba(0,0,0,.38);
-      border: 1px solid rgba(255,255,255,.16);
-      padding: 6px 10px;
-      border-radius: 999px;
+      font-size: 10px;
+      color: var(--muted);
+      opacity: 0.6;
+      pointer-events: none;
     }
 
-    /* Trash can anchor */
-    .trashcan{
+    /* The Trash Can (Target) */
+    #trashZone{
       position:absolute;
-      right: 14px;
-      bottom: 10px;
-      width: 145px;
-      filter: drop-shadow(0 20px 18px rgba(0,0,0,.65));
-      pointer-events:none;
-      z-index: 2;
+      right: 20px;
+      bottom: 20px;
+      width: 140px;
+      height: 160px;
+      z-index: 4;
+      transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    #trashZone img{
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      filter: drop-shadow(0 20px 20px rgba(0,0,0,0.6));
+    }
+    #trashZone.hovered{
+      transform: scale(1.15) rotate(-5deg);
+      filter: brightness(1.2);
     }
 
-    /* animation layer */
+    /* Animation Container */
     #animLayer{
       position:absolute;
       inset:0;
       pointer-events:none;
-      z-index: 3;
+      z-index: 20;
+      overflow: hidden;
     }
 
-    /* thrown bottle image */
-    .throwBottle{
-      position:absolute;
-      width: 48px;
-      left: 118px;
-      top: 152px;
-      animation: throwBottle 0.9s cubic-bezier(.2,.8,.2,1) forwards;
-      filter: drop-shadow(0 14px 12px rgba(0,0,0,.55));
-    }
-    @keyframes throwBottle{
-      0%{ transform: translate(0,0) rotate(0deg) scale(1); opacity:1; }
-      60%{ transform: translate(360px,-165px) rotate(160deg); }
-      100%{ transform: translate(520px,120px) rotate(260deg); opacity:0; }
-    }
-
-    /* Beer pile */
+    /* Beer Pile (Bottom Left) */
     #beerPile{
       position:absolute;
       left: 14px;
-      bottom: 12px;
-      width: calc(100% - 200px);
-      display:grid;
-      grid-template-columns: repeat(auto-fill, 46px);
-      gap: 6px;
-      z-index: 1;
+      bottom: 14px;
+      width: calc(100% - 180px); /* Leave room for trash */
+      height: 100px;
+      display: flex;
+      flex-wrap: wrap-reverse;
+      align-content: flex-start;
+      gap: 4px;
+      z-index: 2;
+      pointer-events: none;
     }
-    .beerIcon{
-      width: 42px;
-      filter: drop-shadow(0 10px 10px rgba(0,0,0,.45));
-      animation: popIn .25s ease-out;
+    .pileItem{
+      width: 30px;
+      height: auto;
+      filter: drop-shadow(0 4px 4px rgba(0,0,0,0.6));
+      animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
-    @keyframes popIn{
-      from{ transform: scale(.6); opacity:0; }
-      to{ transform: scale(1); opacity:1; }
+    @keyframes popIn{ from{ transform: scale(0); } to{ transform: scale(1); } }
+
+    /* --- The Advanced Parabola Animation --- */
+    /* Wrapper moves horizontally (Linear) */
+    .fly-wrapper {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      left: 0;
+      top: 0;
+      /* These vars are set by JS per throw */
+      --startX: 0px;
+      --startY: 0px;
+      --endX: 0px;
+      --endY: 0px;
+      
+      transform: translate(var(--startX), var(--startY));
+      animation: x-axis 0.8s linear forwards;
     }
 
-    /* Overlays */
+    /* Inner moves vertically (Gravity/Ease-In) and rotates */
+    .fly-inner {
+      width: 100%;
+      height: 100%;
+      background-image: url('assets/img/MT.jpeg'); /* Or bottle image */
+      background-size: contain;
+      background-repeat: no-repeat;
+      animation: y-axis 0.8s cubic-bezier(0.55, 0.085, 0.68, 0.53) forwards, spin 0.8s linear infinite;
+    }
+
+    @keyframes x-axis {
+      to { transform: translate(var(--endX), var(--startY)); }
+    }
+    @keyframes y-axis {
+      to { transform: translate(0, calc(var(--endY) - var(--startY))); }
+    }
+    @keyframes spin {
+      to { transform: rotate(720deg); }
+    }
+
+    /* --- Overlays --- */
     .overlay.hidden{ display:none; }
     .overlay{
       position:fixed;
@@ -221,44 +289,48 @@
       flex-direction:column;
       align-items:center;
       justify-content:center;
-      background: rgba(0,0,0,.78);
-      z-index: 9999;
+      background: rgba(0,0,0,.85);
+      z-index: 10000;
       padding: 16px;
+      animation: fadeIn 0.3s;
     }
     .overlayGif{
       width: min(520px, 92vw);
       border-radius: 18px;
       box-shadow: 0 20px 60px rgba(0,0,0,.7);
+      border: 1px solid rgba(255,255,255,0.2);
     }
     .overlayText{
-      margin-top: 14px;
+      margin-top: 20px;
+      font-size: 24px;
       font-weight: 900;
       letter-spacing: 2px;
       text-transform: uppercase;
-      color: rgba(255,255,255,.95);
-      text-shadow: 0 10px 34px rgba(0,0,0,.65);
+      color: var(--gold);
+      text-shadow: 0 0 20px rgba(247,201,72,0.4);
+      text-align: center;
     }
 
-    /* small note box */
-    .note{
-      position:absolute;
-      right: 16px;
-      top: 16px;
-      padding: 10px 12px;
-      border-radius: 14px;
-      background: rgba(0,0,0,.35);
-      border: 1px solid rgba(255,255,255,.12);
-      color: rgba(255,255,255,.85);
-      font-size: 12px;
-      max-width: 220px;
-      backdrop-filter: blur(6px);
+    /* Reset button (small, top right) */
+    .resetBtn{
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(255,0,0,0.2);
+      border: 1px solid rgba(255,0,0,0.4);
+      color: #ffcccc;
+      font-size: 10px;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      z-index: 30;
     }
 
-    @media (max-width:520px){
-      .stage{ height: 650px; }
-      #mugBtn{ width: 160px; height: 160px; }
-      .trashcan{ width: 135px; }
-      .note{ max-width: 180px; }
+    @media (max-width: 600px){
+      #mugBtn{ width: 130px; height: 130px; top: 30px; left: 10px;}
+      #bottleDrag{ width: 45px; height: 120px; left: 150px; top: 80px;}
+      #trashZone{ width: 110px; height: 130px; bottom: 10px; right: 10px; }
+      .title h1{ font-size: 16px; }
     }
   </style>
 </head>
@@ -266,22 +338,21 @@
 <body>
   <div class="bg"></div>
 
-  <!-- Startup overlay (SC-Smile + intro audio) -->
   <div id="startupOverlay" class="overlay hidden">
-    <img src="assets/img/SC-Smile.gif" alt="Stone Cold Smile" class="overlayGif">
-    <div class="overlayText">WELCOME TO BILLY BOB’S</div>
+    <img src="assets/img/SC-Smile.gif" alt="Stone Cold" class="overlayGif">
+    <div class="overlayText">WELCOME TO RYAN'S BAR</div>
   </div>
 
-  <!-- Milestone overlay (every 5 beers alternates gifs) -->
   <div id="milestoneOverlay" class="overlay hidden">
     <img id="milestoneGif" src="" alt="Milestone" class="overlayGif">
+    <div class="overlayText" id="milestoneText">HELL YEAH!</div>
   </div>
 
   <div class="wrap">
     <header>
       <div class="title">
-        <h1>Billy Bob’s Beer Tracker</h1>
-        <p>Tap the mug. Toss the bottle. Stack the beers.</p>
+        <h1>Drunk Ryan’s Counter</h1>
+        <p>Tap the mug or Drag the bottle.</p>
       </div>
       <div class="countBox">
         <div id="count">0</div>
@@ -290,16 +361,21 @@
     </header>
 
     <main class="stage" id="stage">
-      <button id="mugBtn" aria-label="Add beer">
-        <img src="assets/img/Mug.png" alt="Beer Mug">
-        <span class="tapHint">TAP</span>
-      </button>
+      <button class="resetBtn" id="resetBtn">RESET TAB</button>
 
-      <div class="note">
-        If intro audio doesn’t play on load, tap once to unlock sound (Android thing).
+      <div id="mugBtn">
+        <img src="assets/img/Mug.png" alt="Mug">
+        <div class="tapLabel">TAP ME</div>
       </div>
 
-      <img class="trashcan" src="assets/img/Trash-can.png" alt="Trash can">
+      <div id="bottleDrag">
+        <div class="dragLabel">DRAG ME</div>
+        <img src="assets/img/MT.jpeg" alt="Bottle">
+      </div>
+
+      <div id="trashZone">
+        <img src="assets/img/Trash-can.png" alt="Trash">
+      </div>
 
       <div id="animLayer"></div>
       <div id="beerPile"></div>
@@ -307,134 +383,225 @@
   </div>
 
   <script>
-    // ====== Elements
+    // --- Elements ---
     const countEl = document.getElementById("count");
     const mugBtn = document.getElementById("mugBtn");
-    const beerPile = document.getElementById("beerPile");
+    const bottleDrag = document.getElementById("bottleDrag");
+    const trashZone = document.getElementById("trashZone");
     const animLayer = document.getElementById("animLayer");
-
-    const startupOverlay = document.getElementById("startupOverlay");
-    const milestoneOverlay = document.getElementById("milestoneOverlay");
-    const milestoneGif = document.getElementById("milestoneGif");
-
-    // ====== State
-    let beerCount = 0;
-    let milestoneToggle = 0;
-    let tapSoundIndex = 0;
-    let introHasPlayed = false;
-
-    // ====== Intro audio (excluded from rotation)
+    const beerPile = document.getElementById("beerPile");
+    const stage = document.getElementById("stage");
+    
+    // --- Audio Setup ---
     const introAudio = new Audio("assets/audio/stone-cold-drink-beer.mp3");
     introAudio.volume = 0.9;
-
-    // ====== Tap sound rotation (NO intro sound in here)
+    
     const tapSounds = [
-      "assets/audio/Bell.mp3",
+      "assets/audio/beer-bottle-clinks.mp3",
+      "assets/audio/Bell.mp3", 
       "assets/audio/Merica.mp3",
       "assets/audio/SCSA Theme.mp3",
       "assets/audio/Unbelievable.mp3",
-      "assets/audio/What.mp3",
-      "assets/audio/and-his-name-is-john-cena-1.mp3",
-      "assets/audio/beer-bottle-clinks.mp3", // trimmed to 1.3s
-      "assets/audio/gay.mp3",
-      "assets/audio/kill-tony-meow.mp3",
-      "assets/audio/kill-tony-song.mp3",
-      "assets/audio/miller-time.mp3"
+      "assets/audio/What.mp3"
     ];
+    let soundIndex = 0;
 
-    function playIntroOnce() {
-      if (introHasPlayed) return;
-      introHasPlayed = true;
+    // --- State ---
+    let count = 0;
+    let introPlayed = false;
 
-      startupOverlay.classList.remove("hidden");
-
-      introAudio.currentTime = 0;
-      introAudio.play().catch(() => {
-        // Autoplay may be blocked until first tap
-      });
-
-      // hide overlay after a short burst
-      setTimeout(() => {
-        startupOverlay.classList.add("hidden");
-      }, 2200);
-    }
-
-    function playNextTapSound() {
-      const src = tapSounds[tapSoundIndex];
-      const audio = new Audio(src);
-      audio.volume = 0.9;
-
-      audio.play().catch(() => {});
-
-      // Trim ONLY the clinks to 1.3s
-      if (src.includes("beer-bottle-clinks")) {
-        setTimeout(() => {
-          audio.pause();
-          audio.currentTime = 0;
-        }, 1300);
+    // --- Initialization ---
+    function loadState() {
+      const saved = localStorage.getItem('drunkRyanCount');
+      if(saved) {
+        count = parseInt(saved, 10);
+        countEl.innerText = count;
+        // Rebuild visual pile
+        for(let i=0; i<count; i++) addPileItem(false); 
       }
+    }
+    loadState();
 
-      tapSoundIndex = (tapSoundIndex + 1) % tapSounds.length;
+    // --- Core Logic ---
+    function increment(source) {
+      if(!introPlayed) playIntro();
+      
+      count++;
+      countEl.innerText = count;
+      localStorage.setItem('drunkRyanCount', count);
+      
+      playRandomSound();
+      
+      // If tapped, animate throw. If dragged, we already physically moved it.
+      if(source === 'tap') {
+        animateThrow();
+      }
+      
+      addPileItem(true);
+      checkMilestone();
     }
 
-    function showMilestoneGif() {
-      const gifPath = (milestoneToggle % 2 === 0)
-        ? "assets/img/SC-Beers.gif"
-        : "assets/img/SC-swim.gif";
-
-      milestoneToggle++;
-
-      milestoneGif.src = gifPath;
-      milestoneOverlay.classList.remove("hidden");
-
-      setTimeout(() => {
-        milestoneOverlay.classList.add("hidden");
-      }, 1400);
+    function addPileItem(animate) {
+      if(beerPile.children.length > 30) return; // Cap visual pile so it doesn't crash browser
+      const img = document.createElement('img');
+      img.src = 'assets/img/Mug.png';
+      img.className = 'pileItem';
+      if(!animate) img.style.animation = 'none';
+      beerPile.appendChild(img);
     }
 
-    function throwBottleAnimation() {
-      const bottle = document.createElement("img");
-      bottle.src = "assets/img/MT.jpeg";
-      bottle.className = "throwBottle";
-      bottle.alt = "Thrown bottle";
-
-      animLayer.appendChild(bottle);
-      bottle.addEventListener("animationend", () => bottle.remove());
+    function playIntro() {
+      introPlayed = true;
+      const ov = document.getElementById('startupOverlay');
+      ov.classList.remove('hidden');
+      introAudio.play().catch(e => console.log("Audio blocked"));
+      setTimeout(() => ov.classList.add('hidden'), 2200);
     }
 
-    function addBeerToPile() {
-      const icon = document.createElement("img");
-      icon.src = "assets/img/Mug.png";
-      icon.className = "beerIcon";
-      icon.alt = "Beer";
-
-      beerPile.appendChild(icon);
+    function playRandomSound() {
+      const s = new Audio(tapSounds[soundIndex]);
+      s.volume = 0.8;
+      s.play().catch(()=>{});
+      soundIndex = (soundIndex + 1) % tapSounds.length;
     }
 
-    // ====== Startup: try to play intro on load
-    window.addEventListener("load", () => {
-      playIntroOnce();
+    function checkMilestone() {
+      if(count > 0 && count % 5 === 0) {
+        const ov = document.getElementById('milestoneOverlay');
+        const gif = document.getElementById('milestoneGif');
+        gif.src = (count % 10 === 0) ? "assets/img/SC-Beers.gif" : "assets/img/SC-swim.gif";
+        ov.classList.remove('hidden');
+        setTimeout(() => ov.classList.add('hidden'), 2000);
+      }
+    }
+
+    // --- THE FANCY ANIMATION (Calculates arc based on positions) ---
+    function animateThrow() {
+      // 1. Get positions
+      const startRect = mugBtn.getBoundingClientRect();
+      const endRect = trashZone.getBoundingClientRect();
+      const stageRect = stage.getBoundingClientRect();
+
+      // 2. Calculate offsets relative to the stage
+      const startX = (startRect.left + startRect.width/2) - stageRect.left;
+      const startY = (startRect.top + startRect.height/2) - stageRect.top;
+      
+      const endX = (endRect.left + endRect.width/2) - stageRect.left;
+      // Aim for middle of trash can
+      const endY = (endRect.top + endRect.height/2) - stageRect.top; 
+
+      // 3. Create elements
+      const wrapper = document.createElement('div');
+      wrapper.className = 'fly-wrapper';
+      const inner = document.createElement('div');
+      inner.className = 'fly-inner';
+      
+      // 4. Set CSS Variables for this specific throw
+      wrapper.style.setProperty('--startX', `${startX}px`);
+      wrapper.style.setProperty('--startY', `${startY}px`);
+      wrapper.style.setProperty('--endX', `${endX}px`);
+      wrapper.style.setProperty('--endY', `${endY}px`);
+
+      wrapper.appendChild(inner);
+      animLayer.appendChild(wrapper);
+
+      // 5. Clean up after animation
+      setTimeout(() => { wrapper.remove(); }, 800);
+    }
+
+    // --- DRAG AND DROP LOGIC (Touch + Mouse) ---
+    let isDragging = false;
+    let startX, startY, initialLeft, initialTop;
+
+    // Helper to get coordinates
+    const getClientCoords = (e) => {
+      return e.touches ? { x: e.touches[0].clientX, y: e.touches[0].clientY } : { x: e.clientX, y: e.clientY };
+    }
+
+    const startDrag = (e) => {
+      if(e.type === 'mousedown') e.preventDefault(); // prevent image drag ghosting
+      isDragging = true;
+      const coords = getClientCoords(e);
+      startX = coords.x;
+      startY = coords.y;
+      
+      const rect = bottleDrag.getBoundingClientRect();
+      const parentRect = stage.getBoundingClientRect();
+      
+      // Save initial relative position
+      initialLeft = rect.left - parentRect.left;
+      initialTop = rect.top - parentRect.top;
+
+      bottleDrag.classList.add('is-dragging');
+    };
+
+    const moveDrag = (e) => {
+      if(!isDragging) return;
+      const coords = getClientCoords(e);
+      const dx = coords.x - startX;
+      const dy = coords.y - startY;
+
+      // Move element
+      bottleDrag.style.transform = `translate(${dx}px, ${dy}px) scale(1.1)`;
+
+      // Collision Detection with Trash
+      const bottleRect = bottleDrag.getBoundingClientRect();
+      const trashRect = trashZone.getBoundingClientRect();
+
+      if(
+        bottleRect.left < trashRect.right &&
+        bottleRect.right > trashRect.left &&
+        bottleRect.top < trashRect.bottom &&
+        bottleRect.bottom > trashRect.top
+      ) {
+        trashZone.classList.add('hovered');
+      } else {
+        trashZone.classList.remove('hovered');
+      }
+    };
+
+    const endDrag = (e) => {
+      if(!isDragging) return;
+      isDragging = false;
+      bottleDrag.classList.remove('is-dragging');
+      
+      // Check collision one last time
+      if(trashZone.classList.contains('hovered')) {
+        // Success!
+        increment('drag');
+        trashZone.classList.remove('hovered');
+        // Reset position instantly
+        bottleDrag.style.transform = `translate(0px, 0px)`; 
+      } else {
+        // Snap back
+        bottleDrag.style.transform = `translate(0px, 0px)`; 
+      }
+    };
+
+    // Listeners
+    bottleDrag.addEventListener('mousedown', startDrag);
+    bottleDrag.addEventListener('touchstart', startDrag, {passive: false});
+
+    window.addEventListener('mousemove', moveDrag);
+    window.addEventListener('touchmove', moveDrag, {passive: false});
+
+    window.addEventListener('mouseup', endDrag);
+    window.addEventListener('touchend', endDrag);
+
+    // Click Listener for Mug
+    mugBtn.addEventListener('click', () => increment('tap'));
+
+    // Reset Listener
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      if(confirm("Empty the tab?")) {
+        count = 0;
+        countEl.innerText = 0;
+        beerPile.innerHTML = '';
+        localStorage.setItem('drunkRyanCount', 0);
+      }
     });
 
-    // If autoplay is blocked, first interaction will unlock it.
-    // We'll play intro once on the first mug tap if needed.
-    mugBtn.addEventListener("click", () => {
-      // If intro didn't play due to autoplay restrictions, play it now ONCE
-      if (!introHasPlayed) {
-        playIntroOnce();
-      }
-
-      beerCount++;
-      countEl.textContent = beerCount;
-
-      playNextTapSound();
-      throwBottleAnimation();
-      addBeerToPile();
-
-      if (beerCount % 5 === 0) {
-        showMilestoneGif();
-      }
-    });
   </script>
 </body>
 </html>
+
