@@ -534,47 +534,7 @@
     </main>
   </div>
 
-  <script>
-    // ----------------------------
-    // Keys
-    // ----------------------------
-    const KEY_EVENTS = "drunkRyanEventsV2"; // array of timestamps (ms)
-    const KEY_HINT_SEEN = "drunkRyanHintSeenV1";
-    const KEY_SOUND_INDEX = "drunkRyanSoundIndexV1";
-
-    // ----------------------------
-    // Elements
-    // ----------------------------
-    const countEl = document.getElementById("count");
-    const beerPile = document.getElementById("beerPile");
-    const mugBtn = document.getElementById("mugBtn");
-    const startupOverlay = document.getElementById("startupOverlay");
-    const milestoneOverlay = document.getElementById("milestoneOverlay");
-    const milestoneGif = document.getElementById("milestoneGif");
-    const milestoneText = document.getElementById("milestoneText");
-    const beerMask = document.getElementById("beerMask");
-    const beerLiquid = document.getElementById("beerLiquid");
-    const toastEl = document.getElementById("toast");
-    const hintEl = document.getElementById("hint");
-
-    const statsBtn = document.getElementById("statsBtn");
-    const badgesBtn = document.getElementById("badgesBtn");
-    const statsModal = document.getElementById("statsModal");
-    const badgesModal = document.getElementById("badgesModal");
-    const statsBody = document.getElementById("statsBody");
-    const badgesGrid = document.getElementById("badgesGrid");
-    const badgesUnlockedEl = document.getElementById("badgesUnlocked");
-    const badgesTotalEl = document.getElementById("badgesTotal");
-
-    // ----------------------------
-    // Audio
-    // ----------------------------
-    const INTRO_SRC = "assets/audio/stone-cold-drink-beer.mp3";
-
-    // Rotation excludes intro
-    const ROTATION = [
-      "assets/audio/beer-bottle-clinks.mp3",
-      "assets/audio/Bell.mp3",
+  /audio/Bell.mp3",
       "assets/audio/John-cena.mp3",
       "assets/audio/SCSA-Theme.mp3",
       "assets/audio/Unbelievable.mp3",
@@ -847,106 +807,440 @@
     function resetBeer(){
       beerLiquid.style.height = "100%";
       beerMask.style.opacity = "0";
-    }
+<script>
+/* =========================
+   0) STARTUP OVERLAY ESCAPE HATCH (RUNS FIRST)
+   - prevents “stuck on first screen” even if later JS fails
+   ========================= */
+(() => {
+  const startupOverlay = document.getElementById("startupOverlay");
+  if (!startupOverlay) return;
 
-    let holdTimer = null;
-    let draining = false;
-    const LONG_PRESS_MS = 450;
-    const DRAIN_MS = 900;
+  const INTRO_SRC = "assets/audio/stone-cold-drink-beer.mp3";
+  const introAudio = new Audio(INTRO_SRC);
+  introAudio.volume = 1.0;
 
-    function startHold(){
-      draining = false;
+  let introStarted = false;
 
-      beerLiquid.style.height = "100%";
-      beerMask.style.opacity = "1";
+  function hideStartupOverlay(){
+    startupOverlay.style.opacity = "0";
+    // Force hide even if transition is ignored
+    setTimeout(() => {
+      startupOverlay.classList.add("hidden");
+      startupOverlay.style.display = "none";
+      startupOverlay.style.pointerEvents = "none";
+    }, 300);
+  }
 
-      holdTimer = setTimeout(() => {
-        draining = true;
-        beerLiquid.style.height = "0%";
+  window.__startFromOverlay = function(e){
+    if (introStarted) return;
+    introStarted = true;
 
-        setTimeout(() => {
-          resetBeer();
-          logBeer(); // log when empty
-        }, DRAIN_MS);
+    try { e && e.preventDefault && e.preventDefault(); } catch(_) {}
 
-      }, LONG_PRESS_MS);
-    }
+    // Hide immediately so you never get stuck
+    hideStartupOverlay();
 
-    function endHold(){
-      if(holdTimer){
-        clearTimeout(holdTimer);
-        holdTimer = null;
+    // Try to unlock audio context (no await)
+    try{
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (AC){
+        const ctx = new AC();
+        ctx.resume().catch(()=>{});
       }
+    }catch(_){}
 
-      if(!draining){
+    // Play intro in the same gesture stack
+    try{
+      introAudio.currentTime = 0;
+      introAudio.play().catch(()=>{});
+    }catch(_){}
+  };
+
+  // Attach multiple input types for Android reliability
+  startupOverlay.addEventListener("pointerdown", window.__startFromOverlay, { passive:false });
+  startupOverlay.addEventListener("touchstart", window.__startFromOverlay, { passive:false });
+  startupOverlay.addEventListener("click", window.__startFromOverlay);
+
+  // If something else blocks events, allow manual click via inline too
+  startupOverlay.setAttribute("onclick", "__startFromOverlay(event)");
+  startupOverlay.setAttribute("ontouchstart", "__startFromOverlay(event)");
+})();
+
+/* =========================
+   1) APP CODE (DEFENSIVE)
+   ========================= */
+(() => {
+  // Guard: if any error happens, app should still be usable after overlay hides
+  const safe = (fn) => { try { fn(); } catch(e) { console.log(e); } };
+
+  // ----------------------------
+  // Keys
+  // ----------------------------
+  const KEY_EVENTS = "drunkRyanEventsV2";
+  const KEY_HINT_SEEN = "drunkRyanHintSeenV1";
+  const KEY_SOUND_INDEX = "drunkRyanSoundIndexV1";
+
+  // ----------------------------
+  // Elements (defensive)
+  // ----------------------------
+  const countEl = document.getElementById("count");
+  const beerPile = document.getElementById("beerPile");
+  const mugBtn = document.getElementById("mugBtn");
+  const milestoneOverlay = document.getElementById("milestoneOverlay");
+  const milestoneGif = document.getElementById("milestoneGif");
+  const milestoneText = document.getElementById("milestoneText");
+  const beerMask = document.getElementById("beerMask");
+  const beerLiquid = document.getElementById("beerLiquid");
+  const toastEl = document.getElementById("toast");
+  const hintEl = document.getElementById("hint");
+
+  const statsBtn = document.getElementById("statsBtn");
+  const badgesBtn = document.getElementById("badgesBtn");
+  const statsModal = document.getElementById("statsModal");
+  const badgesModal = document.getElementById("badgesModal");
+  const statsBody = document.getElementById("statsBody");
+  const badgesGrid = document.getElementById("badgesGrid");
+  const badgesUnlockedEl = document.getElementById("badgesUnlocked");
+  const badgesTotalEl = document.getElementById("badgesTotal");
+  const resetBtn = document.getElementById("resetBtn");
+
+  // If the mug button isn't found, stop (prevents script crash loops)
+  if (!mugBtn || !countEl || !beerPile) return;
+
+  // ----------------------------
+  // Audio (rotation)
+  // ----------------------------
+  const ROTATION = [
+    "assets/audio/beer-bottle-clinks.mp3",
+    "assets/audio/Bell.mp3",
+    "assets/audio/John-cena.mp3",
+    "assets/audio/SCSA-Theme.mp3",
+    "assets/audio/Unbelievable.mp3",
+    "assets/audio/What.mp3",
+    "assets/audio/gay.mp3",
+    "assets/audio/kill-tony-meow.mp3",
+    "assets/audio/kill-tony-song.mp3",
+    "assets/audio/miller-time.mp3"
+  ];
+  const CLINKS_MAX_SECONDS = 1.5;
+
+  let channel = null;
+  let soundIndex = (() => {
+    const saved = parseInt(localStorage.getItem(KEY_SOUND_INDEX) || "0", 10);
+    return Number.isFinite(saved) ? (saved % ROTATION.length) : 0;
+  })();
+
+  function stopChannel(){
+    try{
+      if(channel){
+        channel.pause();
+        channel.currentTime = 0;
+      }
+    }catch(_){}
+    channel = null;
+  }
+
+  function playRotatingSound(){
+    stopChannel();
+    const src = ROTATION[soundIndex];
+    const a = new Audio(encodeURI(src));
+    a.volume = 0.85;
+
+    if(src.includes("beer-bottle-clinks.mp3")){
+      const stopper = () => {
+        if(a.currentTime >= CLINKS_MAX_SECONDS){
+          a.pause();
+          a.currentTime = 0;
+          a.removeEventListener("timeupdate", stopper);
+        }
+      };
+      a.addEventListener("timeupdate", stopper);
+    }
+
+    a.play().catch(()=>{});
+    channel = a;
+
+    soundIndex = (soundIndex + 1) % ROTATION.length;
+    localStorage.setItem(KEY_SOUND_INDEX, String(soundIndex));
+  }
+
+  // ----------------------------
+  // Storage
+  // ----------------------------
+  function loadEvents(){
+    try{
+      const raw = localStorage.getItem(KEY_EVENTS);
+      const arr = raw ? JSON.parse(raw) : [];
+      return Array.isArray(arr) ? arr.filter(n => Number.isFinite(n)) : [];
+    }catch(_){
+      return [];
+    }
+  }
+  function saveEvents(events){
+    localStorage.setItem(KEY_EVENTS, JSON.stringify(events));
+  }
+
+  let events = loadEvents();
+  events.sort((a,b)=>a-b);
+
+  // ----------------------------
+  // UI helpers
+  // ----------------------------
+  function vibrate(ms){ if(navigator.vibrate) navigator.vibrate(ms); }
+
+  function showToast(text){
+    if(!toastEl) return;
+    toastEl.textContent = text;
+    toastEl.classList.add("show");
+    setTimeout(() => toastEl.classList.remove("show"), 1200);
+  }
+
+  function addPileItem(animate){
+    if(beerPile.children.length > 30) return;
+    const img = document.createElement("img");
+    img.src = "assets/img/Mug.png";
+    img.className = "pileItem";
+    if(!animate) img.style.animation = "none";
+    beerPile.appendChild(img);
+  }
+
+  function rebuildUI(){
+    countEl.textContent = String(events.length);
+    beerPile.innerHTML = "";
+    const pileCount = Math.min(30, events.length);
+    for(let i=0;i<pileCount;i++) addPileItem(false);
+
+    if(hintEl && localStorage.getItem(KEY_HINT_SEEN) === "1"){
+      hintEl.classList.add("hidden");
+    }
+  }
+
+  // ----------------------------
+  // Stats
+  // ----------------------------
+  function yyyyMmDd(t){
+    const d = new Date(t);
+    const y = d.getFullYear();
+    const m = String(d.getMonth()+1).padStart(2,"0");
+    const da = String(d.getDate()).padStart(2,"0");
+    return `${y}-${m}-${da}`;
+  }
+  function monthKey(t){
+    const d = new Date(t);
+    const y = d.getFullYear();
+    const m = String(d.getMonth()+1).padStart(2,"0");
+    return `${y}-${m}`;
+  }
+
+  function computeStats(ev){
+    const total = ev.length;
+    const now = Date.now();
+    const todayKey = yyyyMmDd(now);
+    const thisMonth = monthKey(now);
+
+    let today = 0;
+    let mtd = 0;
+
+    const byDay = new Map();
+    for(const t of ev){
+      const dKey = yyyyMmDd(t);
+      byDay.set(dKey, (byDay.get(dKey) || 0) + 1);
+      if(dKey === todayKey) today++;
+      if(monthKey(t) === thisMonth) mtd++;
+    }
+
+    let highestDay = null, highestCount = 0;
+    let lowestDay = null, lowestCount = Infinity;
+
+    for(const [day, c] of byDay.entries()){
+      if(c > highestCount){ highestCount = c; highestDay = day; }
+      if(c < lowestCount){ lowestCount = c; lowestDay = day; lowestCount = c; }
+    }
+    if(lowestCount === Infinity){ lowestCount = 0; lowestDay = null; }
+
+    const FOUR_HOURS_MS = 4 * 3600 * 1000;
+    const last4h = ev.filter(t => (now - t) <= FOUR_HOURS_MS).length;
+    const bphLast4 = last4h / 4;
+
+    let bphOverall = 0;
+    if(total >= 2){
+      const first = ev[0];
+      const last = ev[total-1];
+      const hours = Math.max(0.01, (last - first) / 3600000);
+      bphOverall = total / hours;
+    }
+
+    return {
+      total, today, mtd,
+      bphLast4, bphOverall,
+      highestDay, highestCount,
+      lowestDay, lowestCount
+    };
+  }
+
+  function renderStats(){
+    if(!statsBody) return;
+    const s = computeStats(events);
+    statsBody.innerHTML = [
+      `<div class="statLine"><b>Total logged:</b> ${s.total}</div>`,
+      `<div class="statLine"><b>Beers today:</b> ${s.today}</div>`,
+      `<div class="statLine"><b>Beers MTD:</b> ${s.mtd}</div>`,
+      `<div class="statLine"><b>Beers/hr (last 4 hrs):</b> ${s.bphLast4.toFixed(2)}</div>`,
+      `<div class="statLine"><b>Beers/hr (overall):</b> ${s.bphOverall.toFixed(2)}</div>`,
+      `<div class="statLine"><b>Highest volume day:</b> ${s.highestDay ? `${s.highestDay} (${s.highestCount})` : "—"}</div>`,
+      `<div class="statLine"><b>Lowest volume day:</b> ${s.lowestDay ? `${s.lowestDay} (${s.lowestCount})` : "—"}</div>`
+    ].join("");
+  }
+
+  // ----------------------------
+  // Badges
+  // ----------------------------
+  const BADGES = [
+    { id:"b1",   req:1,   name:"First Sip", desc:"You logged your first beer." },
+    { id:"b5",   req:5,   name:"First Round", desc:"5 logged beers." },
+    { id:"b10",  req:10,  name:"Buzzed", desc:"10 logged beers." },
+    { id:"b24",  req:24,  name:"Case King", desc:"24 logged beers. Absolute legend." },
+    { id:"b25",  req:25,  name:"Stone Cold Certified", desc:"HELL YEAH status." },
+    { id:"b50",  req:50,  name:"Regular", desc:"50 logged beers." },
+    { id:"b100", req:100, name:"Bar Fixture", desc:"100 logged beers." }
+  ];
+
+  function unlockedSet(total){
+    return new Set(BADGES.filter(b => total >= b.req).map(b => b.id));
+  }
+
+  function renderBadges(){
+    if(!badgesGrid || !badgesUnlockedEl || !badgesTotalEl) return;
+    const total = events.length;
+    const unlocked = unlockedSet(total);
+
+    badgesUnlockedEl.textContent = String(unlocked.size);
+    badgesTotalEl.textContent = String(BADGES.length);
+    badgesGrid.innerHTML = "";
+
+    for(const b of BADGES){
+      const locked = !unlocked.has(b.id);
+      const card = document.createElement("div");
+      card.className = "badge" + (locked ? " locked" : "");
+      card.innerHTML = `
+        <div class="badgeName">${locked ? "???" : b.name}</div>
+        <div class="badgeReq">${b.req} beers</div>
+        <div class="badgeDesc">${locked ? "Keep logging beers to unlock." : b.desc}</div>
+      `;
+      badgesGrid.appendChild(card);
+    }
+  }
+
+  // ----------------------------
+  // Milestones every 5 beers
+  // ----------------------------
+  function showMilestone(total){
+    if(!milestoneOverlay || !milestoneGif || !milestoneText) return;
+    if(total > 0 && total % 5 === 0){
+      const big = (total % 10 === 0);
+      milestoneGif.src = big ? "assets/img/SC-Beers.gif" : "assets/img/SC-swim.gif";
+      milestoneText.textContent = big ? "HELL YEAH!" : "CHEERS!";
+      milestoneOverlay.classList.remove("hidden");
+      setTimeout(() => milestoneOverlay.classList.add("hidden"), 2000);
+    }
+  }
+
+  // ----------------------------
+  // Log beer
+  // ----------------------------
+  function logBeer(){
+    const prevTotal = events.length;
+
+    events.push(Date.now());
+    events.sort((a,b)=>a-b);
+    saveEvents(events);
+
+    countEl.textContent = String(events.length);
+    addPileItem(true);
+
+    const newlyUnlocked = BADGES.find(b => prevTotal < b.req && events.length >= b.req);
+    if(newlyUnlocked){
+      showToast(`Unlocked: ${newlyUnlocked.name}`);
+      vibrate(60);
+    } else {
+      showToast("Logged");
+      vibrate(18);
+    }
+
+    if(hintEl && localStorage.getItem(KEY_HINT_SEEN) !== "1"){
+      localStorage.setItem(KEY_HINT_SEEN, "1");
+      hintEl.classList.add("hidden");
+    }
+
+    playRotatingSound();
+    showMilestone(events.length);
+  }
+
+  // ----------------------------
+  // Tap vs Hold (drain animation)
+  // ----------------------------
+  function resetBeer(){
+    if(beerLiquid) beerLiquid.style.height = "100%";
+    if(beerMask) beerMask.style.opacity = "0";
+  }
+
+  let holdTimer = null;
+  let draining = false;
+  const LONG_PRESS_MS = 450;
+  const DRAIN_MS = 900;
+
+  function startHold(){
+    draining = false;
+
+    if(beerLiquid) beerLiquid.style.height = "100%";
+    if(beerMask) beerMask.style.opacity = "1";
+
+    holdTimer = setTimeout(() => {
+      draining = true;
+      if(beerLiquid) beerLiquid.style.height = "0%";
+
+      setTimeout(() => {
         resetBeer();
         logBeer();
-      }
+      }, DRAIN_MS);
+
+    }, LONG_PRESS_MS);
+  }
+
+  function endHold(){
+    if(holdTimer){
+      clearTimeout(holdTimer);
+      holdTimer = null;
     }
-
-    mugBtn.addEventListener("pointerdown", (e) => { e.preventDefault(); startHold(); }, { passive:false });
-    mugBtn.addEventListener("pointerup", (e) => { e.preventDefault(); endHold(); }, { passive:false });
-    mugBtn.addEventListener("pointercancel", () => { resetBeer(); draining = false; });
-    mugBtn.addEventListener("pointerleave", () => { if(holdTimer || draining) endHold(); });
-
-    // ----------------------------
-    // Intro overlay (FIXED for Android)
-    // - No async/await
-    // - Overlay always dismisses immediately
-    // - Audio play attempted in same gesture stack
-    // ----------------------------
-    const introAudio = new Audio(INTRO_SRC);
-    introAudio.volume = 1.0;
-    let introStarted = false;
-
-    function hideStartupOverlay(){
-      startupOverlay.style.opacity = "0";
-      setTimeout(() => startupOverlay.classList.add("hidden"), 450);
+    if(!draining){
+      resetBeer();
+      logBeer();
     }
+  }
 
-    function startFromOverlay(e){
-      if(introStarted) return;
-      introStarted = true;
+  mugBtn.addEventListener("pointerdown", (e) => { e.preventDefault(); startHold(); }, { passive:false });
+  mugBtn.addEventListener("pointerup", (e) => { e.preventDefault(); endHold(); }, { passive:false });
+  mugBtn.addEventListener("pointercancel", () => { resetBeer(); draining = false; });
+  mugBtn.addEventListener("pointerleave", () => { if(holdTimer || draining) endHold(); });
 
-      hideStartupOverlay();
+  // ----------------------------
+  // Modals
+  // ----------------------------
+  function openModal(el){
+    if(!el) return;
+    el.classList.add("show");
+    el.setAttribute("aria-hidden","false");
+  }
+  function closeModal(el){
+    if(!el) return;
+    el.classList.remove("show");
+    el.setAttribute("aria-hidden","true");
+  }
 
-      // Try to unlock audio context WITHOUT awaiting
-      try{
-        const AC = window.AudioContext || window.webkitAudioContext;
-        if(AC){
-          const ctx = new AC();
-          ctx.resume().catch(()=>{});
-        }
-      }catch(_){}
-
-      // Play intro in the same call stack
-      try{
-        introAudio.currentTime = 0;
-        introAudio.play().catch(()=>{});
-      }catch(_){}
-    }
-
-    startupOverlay.addEventListener("pointerdown", (e) => { e.preventDefault(); startFromOverlay(e); }, { passive:false });
-    startupOverlay.addEventListener("touchstart", (e) => { e.preventDefault(); startFromOverlay(e); }, { passive:false });
-    startupOverlay.addEventListener("click", startFromOverlay);
-
-    // ----------------------------
-    // Modals
-    // ----------------------------
-    function openModal(el){
-      el.classList.add("show");
-      el.setAttribute("aria-hidden","false");
-    }
-    function closeModal(el){
-      el.classList.remove("show");
-      el.setAttribute("aria-hidden","true");
-    }
-
-    [statsModal, badgesModal].forEach(backdrop => {
-      backdrop.addEventListener("click", (e) => {
-        if(e.target === backdrop) closeModal(backdrop);
-      });
-    });
+  safe(() => {
+    if(statsModal) statsModal.addEventListener("click", (e) => { if(e.target === statsModal) closeModal(statsModal); });
+    if(badgesModal) badgesModal.addEventListener("click", (e) => { if(e.target === badgesModal) closeModal(badgesModal); });
 
     document.querySelectorAll("[data-close]").forEach(btn => {
       btn.addEventListener("click", () => {
@@ -954,20 +1248,15 @@
       });
     });
 
-    statsBtn.addEventListener("click", () => {
-      renderStats();
-      openModal(statsModal);
-    });
+    if(statsBtn) statsBtn.addEventListener("click", () => { renderStats(); openModal(statsModal); });
+    if(badgesBtn) badgesBtn.addEventListener("click", () => { renderBadges(); openModal(badgesModal); });
+  });
 
-    badgesBtn.addEventListener("click", () => {
-      renderBadges();
-      openModal(badgesModal);
-    });
-
-    // ----------------------------
-    // Reset
-    // ----------------------------
-    document.getElementById("resetBtn").addEventListener("click", () => {
+  // ----------------------------
+  // Reset
+  // ----------------------------
+  safe(() => {
+    if(resetBtn) resetBtn.addEventListener("click", () => {
       if(confirm("Clear ALL history (timestamps + stats)?")){
         events = [];
         saveEvents(events);
@@ -977,12 +1266,14 @@
         vibrate(30);
       }
     });
+  });
 
-    // ----------------------------
-    // Init
-    // ----------------------------
-    rebuildUI();
-    resetBeer();
-  </script>
+  // ----------------------------
+  // Init
+  // ----------------------------
+  rebuildUI();
+  resetBeer();
+})();
+</script>
 </body>
 </html>
